@@ -1,0 +1,3 @@
+[submodule "GRAPHIC/CMT"]
+	path = GRAPHIC/CMT
+	url = git@github.com:TeomanDeniz/LIBCMT.git
