@@ -33,6 +33,10 @@ G	^^^^^^^ *NSApp;
 #	typedef CGPoint;
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+/* ************************ [v] GLOBAL VARIABLES [v] ************************ */
+extern id const NSDefaultRunLoopMode;
+extern id const NSApp;
+/* ************************ [^] GLOBAL VARIABLES [^] ************************ */
 /* ************************* [v] HELPER MACROS [v] ************************** */
 #	ifndef MSG
 #		define MSG(\
@@ -125,6 +129,7 @@ int
 	}
 	else
 		while (!__GRAPHIC_LOOP__(GRAPHIC));
+	return (0);
 }
 
 static int
@@ -132,6 +137,9 @@ static int
 {
 	NSUInteger (EVENT_TYPE);
 	id              (EVENT);
+
+	if (!GRAPHIC->WINDOW_MODULE)
+		return (1);
 
 	MSG1(\
 		void, \
@@ -159,7 +167,7 @@ static int
 	);
 
 	if (!EVENT)
-		return (-1);
+		return (0);
 
 	EVENT_TYPE = MSG(NSUInteger, EVENT, "type");
 	GRAPHIC->MOUSE.LEFT_UP = 0;
@@ -167,27 +175,40 @@ static int
 	GRAPHIC->MOUSE.VALUE = 0;
 	GRAPHIC->MOUSE.MIDDLE_UP = 0;
 	GRAPHIC->MOUSE.WHEEL = 0;
-	GRAPHIC->MOUSE.HORIZANTAL_WHELL = 0;
+	GRAPHIC->MOUSE.HORIZANTAL_WHEEL = 0;
 
 	if (EVENT_TYPE == 1) /* NSEventTypeLeftMouseDown */
-		GRAPHIC->MOUSE |= 1;
+	{
+		GRAPHIC->MOUSE.LEFT_DOWN = 1;
+		if (!!GRAPHIC->FUNCTION_MOUSE)
+			GRAPHIC->FUNCTION_MOUSE(\
+				GRAPHIC->MOUSE.X, \
+				GRAPHIC->MOUSE.Y, \
+				GRAPHIC->MOUSE.VALUE, \
+				GRAPHIC->FUNCTION_MOUSE_ARG\
+			);
+	}
 	else if (EVENT_TYPE == 2) /* NSEventTypeLeftMouseUp*/
-		GRAPHIC->MOUSE &= ~1;
+	{
+		GRAPHIC->MOUSE.LEFT_DOWN = 0;
+		GRAPHIC->MOUSE.LEFT_UP = 1;
+	}
 	else if (\
 		EVENT_TYPE == 5 || /* NSEventTypeMouseMoved */\
-		EVENT_TYPE == 6 /* NSEventTypeLeftMouseDragged */\
+		EVENT_TYPE == 6 || /* NSEventTypeLeftMouseDragged */\
+		EVENT_TYPE == 7 /* NSEventTypeRightMouseDragged */\
 	)
 	{
 		register CGPoint (X_AND_Y);
 
 		X_AND_Y = MSG(CGPoint, EVENT, "locationInWindow");
 		GRAPHIC->MOUSE.X = (int)X_AND_Y.x;
-		GRAPHIC->MOUSE.Y = (GRAPHIC->HEIGHT - (int)X_AND_Y.y);
+		GRAPHIC->MOUSE.Y = ((int)X_AND_Y.y);
 
 		if (!!GRAPHIC->FUNCTION_MOUSE)
 			GRAPHIC->FUNCTION_MOUSE(\
-				GRAPHIC->X, \
-				GRAPHIC->Y, \
+				GRAPHIC->MOUSE.X, \
+				GRAPHIC->MOUSE.Y, \
 				GRAPHIC->MOUSE.VALUE, \
 				GRAPHIC->FUNCTION_MOUSE_ARG\
 			);
@@ -818,9 +839,11 @@ static int
 		}
 
 		if (EVENT_TYPE == 10)
+		{
 			if (!!GRAPHIC->FUNCTION_KEY_DOWN)
 				GRAPHIC->FUNCTION_KEY_DOWN(GRAPHIC->KEY.DOWN, \
 					GRAPHIC->FUNCTION_KEY_DOWN_ARG);
+		}
 		else if (!!GRAPHIC->FUNCTION_KEY_UP)
 			GRAPHIC->FUNCTION_KEY_UP(GRAPHIC->KEY.UP, \
 				GRAPHIC->FUNCTION_KEY_UP_ARG);

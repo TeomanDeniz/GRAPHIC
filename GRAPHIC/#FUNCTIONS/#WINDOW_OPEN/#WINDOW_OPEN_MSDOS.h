@@ -45,6 +45,7 @@ void
 
 	__REGISTER__.x.ax = 19; /* 0X13 | 13H */
 	__dpmi_int(0X10, &__REGISTER__);
+	GRAPHIC->WINDOW_EXIST = 1;
 }
 #else
 #	error "Please do not include this header directly!"

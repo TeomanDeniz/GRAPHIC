@@ -18,6 +18,7 @@
 #	 struct GRAPHIC;
 #	        */
 #	include <X11/Xlib.h> /*
+#	    int XFreeGC(Display *, GC);
 #	    int XCloseDisplay(Display *);
 #	        */
 #	include <stdlib.h> /*
@@ -27,7 +28,36 @@
 void
 	WINDOW_CLOSE(struct GRAPHIC *GRAPHIC)
 {
-	XCloseDisplay(GRAPHIC->DISPLAY);
+	if (!!GRAPHIC->GRAPHICS_CONTEXT)
+	{
+		XFreeGC(GRAPHIC->DISPLAY, GRAPHIC->GRAPHICS_CONTEXT);
+		GRAPHIC->GRAPHICS_CONTEXT = ((void *)0);
+	}
+
+	if (!!GRAPHIC->WINDOW_HANDLE)
+	{
+		HDC (__HDC__);
+
+		__HDC__ = GetDC(GRAPHIC->WINDOW_HANDLE);
+
+		if (!!__HDC__)
+			ReleaseDC(GRAPHIC->WINDOW_HANDLE, __HDC__);
+
+		DestroyWindow(GRAPHIC->WINDOW_HANDLE);
+		GRAPHIC->WINDOW_HANDLE = ((void *)0);
+	}
+
+	if (!!GRAPHIC->DISPLAY)
+	{
+		XCloseDisplay(GRAPHIC->DISPLAY);
+		GRAPHIC->DISPLAY = ((void *)0);
+	}
+
+	if (!!GRAPHIC->IMAGE)
+	{
+		XDestroyImage(GRAPHIC->IMAGE);
+		GRAPHIC->IMAGE = ((void *)0);
+	}
 
 	if (!!GRAPHIC->BUFFER)
 	{

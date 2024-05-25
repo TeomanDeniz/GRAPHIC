@@ -77,6 +77,7 @@ int
 	}
 	else
 		while (!__GRAPHIC_LOOP__(GRAPHIC));
+	return (0);
 }
 
 static int
@@ -94,7 +95,7 @@ static int
 		GRAPHIC->MOUSE.VALUE = 0;
 		GRAPHIC->MOUSE.MIDDLE_UP = 0;
 		GRAPHIC->MOUSE.WHEEL = 0;
-		GRAPHIC->MOUSE.HORIZANTAL_WHELL = 0;
+		GRAPHIC->MOUSE.HORIZANTAL_WHEEL = 0;
 		XNextEvent(GRAPHIC->DISPLAY, &EVENT);
 		if (EVENT.type == ButtonPress)
 		{
@@ -120,25 +121,25 @@ static int
 				}
 				case (Button4):
 				{
-					GRAPHIC->MOUSE.WHELL = -1;
+					GRAPHIC->MOUSE.WHEEL = -1;
 					GRAPHIC->MOSUE.VALUE = 4;
 					break ;
 				}
 				case (Button5):
 				{
-					GRAPHIC->MOUSE.WHELL = 1;
+					GRAPHIC->MOUSE.WHEEL = 1;
 					GRAPHIC->MOSUE.VALUE = 5;
 					break ;
 				}
 				case (Button6):
 				{
-					GRAPHIC->MOUSE.HORIZANTAL_WHELL = -1;
+					GRAPHIC->MOUSE.HORIZANTAL_WHEEL = -1;
 					GRAPHIC->MOSUE.VALUE = 6;
 					break ;
 				}
 				case (Button7):
 				{
-					GRAPHIC->MOUSE.HORIZANTAL_WHELL = 1;
+					GRAPHIC->MOUSE.HORIZANTAL_WHEEL = 1;
 					GRAPHIC->MOSUE.VALUE = 7;
 					break ;
 				}

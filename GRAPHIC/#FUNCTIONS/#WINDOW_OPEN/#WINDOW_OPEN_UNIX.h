@@ -16,10 +16,10 @@
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "../../#STRUCT.h" /*
 #	 struct GRAPHIC;
+#	   void WINDOW_CLOSE(struct GRAPHIC *);
 #	        */
 #	include <stdlib.h> /*
 #	   void *malloc(size_t);
-#	   void free(void *);
 #	        */
 #	include "../../CMT/FUNCTIONS/PREFETCH.h" /*
 #	   void PREFETCH_RANGE(void *VARIABLE, unsigned int LENGHT)
@@ -59,6 +59,13 @@ register unsigned int HEIGHT)
 	GRAPHIC->WIDTH = WIDTH;
 	GRAPHIC->HEIGHT = HEIGHT;
 	GRAPHIC->DISPLAY = XOpenDisplay(NULL);
+
+	if (!GRAPHIC->WINDOW)
+	{
+		WINDOW_CLOSE(GRAPHIC);
+		return (-1);
+	}
+
 	SCREEN = DefaultScreen(GRAPHIC->DISPLAY);
 	GRAPHIC->WINDOW = XCreateSimpleWindow(\
 		GRAPHIC->DISPLAY, \
@@ -71,12 +78,26 @@ register unsigned int HEIGHT)
 		BlackPixel(GRAPHIC->DISPLAY, SCREEN), \
 		WhitePixel(GRAPHIC->DISPLAY, SCREEN)\
 	);
+
+	if (!GRAPHIC->WINDOW)
+	{
+		WINDOW_CLOSE(GRAPHIC);
+		return (-1);
+	}
+
 	GRAPHIC->GRAPHICS_CONTEXT = XCreateGC(\
 		GRAPHIC->DISPLAY, \
 		GRAPHIC->WINDOW, \
 		0, \
 		0\
 	);
+
+	if (!GRAPHIC->GRAPHICS_CONTEXT)
+	{
+		WINDOW_CLOSE(GRAPHIC);
+		return (-1);		
+	}
+
 	XSelectInput(\
 		GRAPHIC->DISPLAY, \
 		GRAPHIC->WINDOW, \
@@ -107,11 +128,11 @@ register unsigned int HEIGHT)
 
 	if (!GRAPHIC->IMAGE)
 	{
-		free(GRAPHIC->BUFFER);
-		GRAPHIC->BUFFER = ((void *)0);
+		WINDOW_CLOSE(GRAPHIC);
 		return (-1);
 	}
 
+	GRAPHIC->WINDOW_EXIST = 1;
 	return (0);
 }
 #else

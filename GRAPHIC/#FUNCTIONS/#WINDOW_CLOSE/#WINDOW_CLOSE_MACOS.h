@@ -53,13 +53,21 @@ void
 	WINDOW_CLOSE(struct GRAPHIC *GRAPHIC)
 {
 	if (!!GRAPHIC->WINDOW_MODULE)
+	{
 		MSG(void, GRAPHIC->WINDOW_MODULE, "close");
+		//free(GRAPHIC->WINDOW_MODULE);
+		//GRAPHIC->WINDOW_MODULE = ((void *)0);
+	}
 
 	if (!!GRAPHIC->BUFFER)
 	{
 		free(GRAPHIC->BUFFER);
 		GRAPHIC->BUFFER = (void *)0;
 	}
+
+	system("leaks a.out");
+	getchar();
+	exit(0);
 }
 #else
 #	error "Please do not include this header directly!"

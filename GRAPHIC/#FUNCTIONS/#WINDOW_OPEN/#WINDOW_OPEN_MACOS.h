@@ -314,6 +314,7 @@ register unsigned int HEIGHT)
 	MSG1(void, GRAPHIC->WINDOW_MODULE, "makeKeyAndOrderFront:", id, nil);
 	MSG(void, GRAPHIC->WINDOW_MODULE, "center");
 	MSG1(void, NSApp, "activateIgnoringOtherApps:", BOOL, YES);
+	GRAPHIC->WINDOW_EXIST = 1;
 	return (0);
 }
 

@@ -285,8 +285,8 @@ struct S_MOUSE
 	unsigned char  (RIGHT_DOUBLE_CLICK) : 1;
 	unsigned char         (MIDDLE_DOWN) : 1;
 	unsigned char           (MIDDLE_UP) : 1;
-	int                             (WHELL);
-	int                  (HORIZANTAL_WHELL);
+	int                             (WHEEL);
+	int                  (HORIZANTAL_WHEEL);
 	unsigned int                        (X);
 	unsigned int                        (Y);
 	unsigned char                   (VALUE);
@@ -303,7 +303,7 @@ struct s_mouse
 	unsigned char  (right_double_click) : 1;
 	unsigned char         (middle_down) : 1;
 	unsigned char           (middle_up) : 1;
-	int                             (whell);
+	int                             (wheel);
 	int                  (horizantal_wheel);
 	unsigned int                        (x);
 	unsigned int                        (y);
@@ -341,6 +341,7 @@ struct GRAPHIC
 	(unsigned int, unsigned int, unsigned char, void *);
 	void                          *(FUNCTION_MOUSE_ARG);
 	unsigned int                       (FPS_START_TIME);
+	unsigned char                        (WINDOW_EXIST);
 #	if defined(__APPLE__)
 	id                                  (WINDOW_MODULE);
 #	else
@@ -386,6 +387,7 @@ struct graphic
 	(unsigned int, unsigned int, unsigned char, void *);
 	void                          *(FUNCTION_MOUSE_ARG);
 	unsigned int                       (FPS_START_TIME);
+	unsigned char                        (WINDOW_EXIST);
 #	if defined(__APPLE__)
 	id                                  (WINDOW_MODULE);
 #	else
