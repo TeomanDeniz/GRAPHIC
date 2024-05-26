@@ -279,12 +279,10 @@ struct S_MOUSE
 {
 	unsigned char           (LEFT_DOWN) : 1;
 	unsigned char             (LEFT_UP) : 1;
-	unsigned char   (LEFT_DOUBLE_CLICK) : 1;
 	unsigned char          (RIGHT_DOWN) : 1;
 	unsigned char            (RIGHT_UP) : 1;
-	unsigned char  (RIGHT_DOUBLE_CLICK) : 1;
 	unsigned char         (MIDDLE_DOWN) : 1;
-	unsigned char           (MIDDLE_UP) : 1;
+	unsigned char           (MIDDLE_UP) : 3;
 	int                             (WHEEL);
 	int                  (HORIZANTAL_WHEEL);
 	unsigned int                        (X);
@@ -297,12 +295,10 @@ struct s_mouse
 {
 	unsigned char           (left_down) : 1;
 	unsigned char             (left_up) : 1;
-	unsigned char   (left_double_click) : 1;
 	unsigned char          (right_down) : 1;
 	unsigned char            (right_up) : 1;
-	unsigned char  (right_double_click) : 1;
 	unsigned char         (middle_down) : 1;
-	unsigned char           (middle_up) : 1;
+	unsigned char           (middle_up) : 3;
 	int                             (wheel);
 	int                  (horizantal_wheel);
 	unsigned int                        (x);
