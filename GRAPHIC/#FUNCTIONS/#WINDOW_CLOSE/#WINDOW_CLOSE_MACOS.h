@@ -55,8 +55,8 @@ void
 	if (!!GRAPHIC->WINDOW_MODULE)
 	{
 		MSG(void, GRAPHIC->WINDOW_MODULE, "close");
-		//free(GRAPHIC->WINDOW_MODULE);
-		//GRAPHIC->WINDOW_MODULE = ((void *)0);
+		MSG(void, GRAPHIC->WINDOW_MODULE, "release");
+		GRAPHIC->WINDOW_MODULE = NULL;
 	}
 
 	if (!!GRAPHIC->BUFFER)
@@ -65,9 +65,7 @@ void
 		GRAPHIC->BUFFER = (void *)0;
 	}
 
-	system("leaks a.out");
-	getchar();
-	exit(0);
+	GRAPHIC->WINDOW_EXIST = 0;
 }
 #else
 #	error "Please do not include this header directly!"

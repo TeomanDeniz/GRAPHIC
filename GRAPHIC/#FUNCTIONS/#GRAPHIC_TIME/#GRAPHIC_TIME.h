@@ -14,7 +14,7 @@
 
 #ifndef GRAPHIC_FUNCTIONS__GRAPHIC_TIME_H
 #	define GRAPHIC_FUNCTIONS__GRAPHIC_TIME_H 202405
-#	ifdef __APPLE__
+#	if (defined(__APPLE__) && !defined(X11))
 #		include "#GRAPHIC_TIME_MACOS.h"
 #	else
 #		ifdef _WIN32
@@ -26,7 +26,7 @@
 #				if (defined(__linux__) || defined(__gnu_linux__) || \
 					defined(__FreeBSD__) || defined(__NetBSD__) || \
 					defined(__OpenBSD__) || defined(__DragonFly__) || \
-					defined(__sun)) /* __sun IS SOLARIS SYSTEMS */
+					defined(__sun) || defined(X11))
 #					include "#GRAPHIC_TIME_UNIX.h"
 #				endif /* UNIX */
 #			endif /* DJGPP (DOS) */

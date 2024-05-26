@@ -1,3 +1,5 @@
+
+#define X11
 #include "GRAPHIC.h"
 
 #include <stdio.h>

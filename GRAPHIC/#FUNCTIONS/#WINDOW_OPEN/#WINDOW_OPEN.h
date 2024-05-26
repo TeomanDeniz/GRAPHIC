@@ -19,7 +19,7 @@
 #	 struct GRAPHIC;
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
-#	ifdef __APPLE__
+#	if (defined(__APPLE__) && !defined(X11))
 #		include "#WINDOW_OPEN_MACOS.h"
 #	else
 #		ifdef _WIN32
@@ -31,7 +31,7 @@
 #				if (defined(__linux__) || defined(__gnu_linux__) || \
 					defined(__FreeBSD__) || defined(__NetBSD__) || \
 					defined(__OpenBSD__) || defined(__DragonFly__) || \
-					defined(__sun)) /* __sun IS SOLARIS SYSTEMS */
+					defined(__sun) || defined(X11))
 #					include "#WINDOW_OPEN_UNIX.h"
 #				endif /* UNIX */
 #			endif /* DJGPP (DOS) */
