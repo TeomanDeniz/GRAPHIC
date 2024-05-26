@@ -1,5 +1,4 @@
 
-#define X11
 #include "GRAPHIC.h"
 
 #include <stdio.h>
@@ -11,18 +10,19 @@
 // Unix: gcc test.c -lX11 -lasound
 
 int
-	test(unsigned int x, unsigned int y, unsigned char value, void *arg)
+	test(void *arg)
 {
 	struct graphic	*graphic;
 
 	graphic = arg;
 
-	printf("%d - %d - %d %d\n", x, y, graphic->mouse.left_down, graphic->mouse.left_up);
+	if (graphic->mouse.x - 15 >= 0 && graphic->mouse.x - 15 < graphic->width && \
+		graphic->mouse.y - 15 >= 0 && graphic->mouse.y - 15 < graphic->height)
+		put_pixel(graphic, graphic->mouse.x - 15, graphic->mouse.y - 15, 0XFF0000);
 
 	if (graphic->key.esc)
-	{
 		window_close(graphic);
-	}
+
 	return (0);
 }
 
@@ -33,7 +33,7 @@ int
 
 	graphic_setup(&graphic);
 	window_open(&graphic, 700, 700);
-	event_hook_mouse(&graphic, test, (void *)&graphic);
+	event_hook_loop(&graphic, test, (void *)&graphic);
 	graphic_loop(&graphic);
 	return (0);
 }

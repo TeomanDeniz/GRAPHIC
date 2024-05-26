@@ -203,7 +203,7 @@ static int
 
 		X_AND_Y = MSG(CGPoint, EVENT, "locationInWindow");
 		GRAPHIC->MOUSE.X = (int)X_AND_Y.x;
-		GRAPHIC->MOUSE.Y = ((int)X_AND_Y.y);
+		GRAPHIC->MOUSE.Y = (GRAPHIC->HEIGHT - (int)X_AND_Y.y);
 
 		if (!!GRAPHIC->FUNCTION_MOUSE)
 			GRAPHIC->FUNCTION_MOUSE(\
