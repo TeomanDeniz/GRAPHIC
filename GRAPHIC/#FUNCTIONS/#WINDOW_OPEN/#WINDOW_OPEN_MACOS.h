@@ -77,9 +77,8 @@ v	>>>>>>> (CGImageRef)
 #	   void CGContextDrawImage(CGContextRef, CGRect, CGImageRef);
 #	   void CGImageRelease(CGImageRef);
 #	        */
-#	include "../../CMT/KEYWORDS/UNUSED.h" /*
-#	 define UNUSED
-#	 define NOPE
+#	include "../../CMT/KEYWORDS/IGNORE.h" /*
+#	 define IGNORE
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 /* ************************* [v] HELPER MACROS [v] ************************** */
@@ -314,15 +313,14 @@ register unsigned int HEIGHT)
 	MSG1(void, GRAPHIC->WINDOW_MODULE, "makeKeyAndOrderFront:", id, nil);
 	MSG(void, GRAPHIC->WINDOW_MODULE, "center");
 	MSG1(void, NSApp, "activateIgnoringOtherApps:", BOOL, YES);
-	GRAPHIC->WINDOW_EXIST = 1;
 	return (0);
 }
 
 extern INLINE void
 	GRAPHIC_DRAW_RECT(const id VIEW, const SEL SELECTOR, const CGRect RECT)
 {
-	NOPE RECT;
-	NOPE SELECTOR;
+	IGNORE RECT;
+	IGNORE SELECTOR;
 
 	struct GRAPHIC    *(GRAPHIC);
 	CGContextRef       (CONTEXT);
@@ -381,9 +379,9 @@ extern INLINE void
 extern INLINE BOOL
 	WINDOW_SHOULD_CLOSE(const id VIEW, const SEL SELECTOR, const id WINDOW)
 {
-	NOPE VIEW;
-	NOPE SELECTOR;
-	NOPE WINDOW;
+	IGNORE VIEW;
+	IGNORE SELECTOR;
+	IGNORE WINDOW;
 
 	MSG1(void, NSApp, "terminate:", id, NSApp);
 	return (YES);

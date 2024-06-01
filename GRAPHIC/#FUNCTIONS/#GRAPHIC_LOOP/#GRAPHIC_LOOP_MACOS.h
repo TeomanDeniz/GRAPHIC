@@ -14,8 +14,9 @@
 
 #ifdef GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_H
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../../#STRUCT.h" /*
+#	include "../../../GRAPHIC.h" /*
 #	 struct GRAPHIC;
+#      void WINDOW_CLOSE(struct GRAPHIC *);
 #	        */
 #	include <objc/objc-runtime.h> /*
 #	typedef *SEL;
@@ -25,12 +26,27 @@
 #	 define YES
 v	>>>>>>> (NSApplication)
 G	^^^^^^^ *NSApp;
+#	 define NSUIntegerMax
 #	typedef BOOL;
 #	typedef id;
 #	typedef NSUInteger;
 #	        */
 #	include <CoreGraphics/CoreGraphics.h> /*
 #	typedef CGPoint;
+#	        */
+#	include <CoreFoundation/CoreFoundation.h> /*
+#	 struct CFRunLoopTimerContext;
+#	typedef CFRunLoopTimerRef;
+v	 >>>>>> (CFRunLoopTimerRef)
+#	 ^^^^^^ CFRunLoopTimerCreate(CFAllocatorRef, CFAbsoluteTime, CFTimeInterval,
+>	        CFOptionFlags, CFIndex, void (*f)(CFRunLoopTimerRef, void *),
+>	        CFRunLoopTimerContext *);
+#	   void CFRunLoopAddTimer(CFRunLoopRef, CFRunLoopTimerRef, CFStringRef);
+v	 >>>>>> (CFRunLoopRef)
+#	 ^^^^^^ CFRunLoopGetMain(void);
+#	        */
+#	include "../../CMT/KEYWORDS/IGNORE.h" /*
+#	 define IGNORE
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 /* ************************ [v] GLOBAL VARIABLES [v] ************************ */
@@ -117,59 +133,100 @@ extern id const NSApp;
 #	endif /* MSG4 */
 /* ************************* [^] HELPER MACROS [^] ************************** */
 /* *************************** [v] PROTOTYPES [v] *************************** */
-static int	__GRAPHIC_LOOP__(struct GRAPHIC *GRAPHIC);
+static void	__GRAPHIC_LOOP__(CFRunLoopObserverRef OBSERVER, \
+CFRunLoopActivity ACTIVITY, void *ARG);
+static void	__TIMER_LOOP__(CFRunLoopTimerRef OBSERVER, void *ARG);
 /* *************************** [^] PROTOTYPES [^] *************************** */
+
+static void /* Thank you MiniLibX!!! You saved my life! <3 <3 */
+	__TIMER_LOOP__(CFRunLoopTimerRef OBSERVER, void *ARG)
+{
+	IGNORE OBSERVER;
+
+	((struct GRAPHIC *)ARG)->\
+		FUNCTION_LOOP(((struct GRAPHIC *)ARG)->FUNCTION_LOOP_ARG);
+}
+
 int
 	GRAPHIC_LOOP(struct GRAPHIC *GRAPHIC)
 {
+	CFRunLoopTimerContext       (TIMER_CONTEXT);
+	CFRunLoopTimerRef                (TIMER_ID);
+	CFRunLoopObserverContext (OBSERVER_CONTEXT);
+	CFRunLoopObserverRef          (OBSERVER_ID);
+
 	if (!!GRAPHIC->FUNCTION_LOOP)
 	{
-		while (!__GRAPHIC_LOOP__(GRAPHIC))
-			GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
+		TIMER_CONTEXT.version = 0;
+		TIMER_CONTEXT.info = (void *)GRAPHIC;
+		TIMER_CONTEXT.retain = ((void *)0);
+		TIMER_CONTEXT.release = ((void *)0);
+		TIMER_CONTEXT.copyDescription = ((void *)0);
+		TIMER_ID = CFRunLoopTimerCreate(kCFAllocatorDefault, 0.0, 0.0001, 0, \
+			0, __TIMER_LOOP__, &TIMER_CONTEXT);
+		GRAPHIC->TIMER_ID = TIMER_ID;
+		CFRunLoopAddTimer(CFRunLoopGetMain(), TIMER_ID, kCFRunLoopCommonModes);
 	}
-	else
-		while (!__GRAPHIC_LOOP__(GRAPHIC));
+
+	OBSERVER_CONTEXT.version = 0;
+	OBSERVER_CONTEXT.info = (void *)GRAPHIC;
+	OBSERVER_CONTEXT.retain = ((void *)0);
+	OBSERVER_CONTEXT.release = ((void *)0);
+	OBSERVER_CONTEXT.copyDescription = ((void *)0);
+	OBSERVER_ID = CFRunLoopObserverCreate(NULL, kCFRunLoopBeforeTimers, true, \
+		0, __GRAPHIC_LOOP__, &OBSERVER_CONTEXT);
+	GRAPHIC->OBSERVER_ID = OBSERVER_ID;
+	CFRunLoopAddObserver(CFRunLoopGetMain(), OBSERVER_ID, \
+		kCFRunLoopCommonModes);
+
+	while (!!GRAPHIC->WINDOW_MODULE)
+	{
+		MSG1(\
+			void, \
+			MSG(\
+				id, \
+				GRAPHIC->WINDOW_MODULE, \
+				"contentView"\
+			), \
+			"setNeedsDisplay:", \
+			BOOL, \
+			YES\
+		);
+		GRAPHIC->EVENT = MSG4(\
+			id, \
+			NSApp, \
+			"nextEventMatchingMask:untilDate:inMode:dequeue:", \
+			NSUInteger, \
+			NSUIntegerMax, \
+			id, \
+			NULL, \
+			id, \
+			NSDefaultRunLoopMode, \
+			BOOL, \
+			YES\
+		);
+
+		if (!GRAPHIC->EVENT)
+			continue ;
+
+		MSG1(void, NSApp, "sendEvent:", id, GRAPHIC->EVENT); // Do next event
+	}
+
 	return (0);
 }
 
-static int
-	__GRAPHIC_LOOP__(struct GRAPHIC *GRAPHIC)
+static void
+	__GRAPHIC_LOOP__(CFRunLoopObserverRef OBSERVER, \
+CFRunLoopActivity ACTIVITY, void *ARG)
 {
-	NSUInteger (EVENT_TYPE);
-	id              (EVENT);
+	struct GRAPHIC *(GRAPHIC);
+	NSUInteger   (EVENT_TYPE);
 
-	if (!GRAPHIC->WINDOW_MODULE)
-		return (1);
+	IGNORE OBSERVER;
+	IGNORE ACTIVITY;
 
-	MSG1(\
-		void, \
-		MSG(\
-			id, \
-			GRAPHIC->WINDOW_MODULE, \
-			"contentView"\
-		), \
-		"setNeedsDisplay:", \
-		BOOL, \
-		YES\
-	);
-	EVENT = MSG4(\
-		id, \
-		NSApp, \
-		"nextEventMatchingMask:untilDate:inMode:dequeue:", \
-		NSUInteger, \
-		NSUIntegerMax, \
-		id, \
-		NULL, \
-		id, \
-		NSDefaultRunLoopMode, \
-		BOOL, \
-		YES\
-	);
-
-	if (!EVENT)
-		return (0);
-
-	EVENT_TYPE = MSG(NSUInteger, EVENT, "type");
+	GRAPHIC = (struct GRAPHIC *)ARG;
+	EVENT_TYPE = MSG(NSUInteger, GRAPHIC->EVENT, "type");
 	GRAPHIC->MOUSE.LEFT_UP = 0;
 	GRAPHIC->MOUSE.RIGHT_UP = 0;
 	GRAPHIC->MOUSE.VALUE = 0;
@@ -177,53 +234,60 @@ static int
 	GRAPHIC->MOUSE.WHEEL = 0;
 	GRAPHIC->MOUSE.HORIZANTAL_WHEEL = 0;
 
-	if (EVENT_TYPE == 1) /* NSEventTypeLeftMouseDown */
+	switch (EVENT_TYPE) // "switch case" is speed! Wrom wrommmm!!!
 	{
-		GRAPHIC->MOUSE.LEFT_DOWN = 1;
-		if (!!GRAPHIC->FUNCTION_MOUSE)
-			GRAPHIC->FUNCTION_MOUSE(\
-				GRAPHIC->MOUSE.X, \
-				GRAPHIC->MOUSE.Y, \
-				GRAPHIC->MOUSE.VALUE, \
-				GRAPHIC->FUNCTION_MOUSE_ARG\
+		case (1): /* NSEventTypeLeftMouseDown */
+		{
+			GRAPHIC->MOUSE.LEFT_DOWN = 1;
+			if (!!GRAPHIC->FUNCTION_MOUSE)
+				GRAPHIC->FUNCTION_MOUSE(\
+					GRAPHIC->MOUSE.X, \
+					GRAPHIC->MOUSE.Y, \
+					GRAPHIC->MOUSE.VALUE, \
+					GRAPHIC->FUNCTION_MOUSE_ARG\
+				);
+			break ;
+		}
+		case (2): /* NSEventTypeLeftMouseUp*/
+		{
+			GRAPHIC->MOUSE.LEFT_DOWN = 0;
+			GRAPHIC->MOUSE.LEFT_UP = 1;
+			break ;
+		}
+		case (5): /* NSEventTypeMouseMoved */
+		case (6): /* NSEventTypeLeftMouseDragged */
+		case (7): /* NSEventTypeRightMouseDragged */
+		{
+			register CGPoint (X_AND_Y);
+
+			X_AND_Y = MSG(\
+				CGPoint, \
+				GRAPHIC->WINDOW_MODULE, \
+				"mouseLocationOutsideOfEventStream" /* Thx miniLibX <3 */\
 			);
-	}
-	else if (EVENT_TYPE == 2) /* NSEventTypeLeftMouseUp*/
-	{
-		GRAPHIC->MOUSE.LEFT_DOWN = 0;
-		GRAPHIC->MOUSE.LEFT_UP = 1;
-	}
-	else if (\
-		EVENT_TYPE == 5 || /* NSEventTypeMouseMoved */\
-		EVENT_TYPE == 6 || /* NSEventTypeLeftMouseDragged */\
-		EVENT_TYPE == 7 /* NSEventTypeRightMouseDragged */\
-	)
-	{
-		register CGPoint (X_AND_Y);
+			GRAPHIC->MOUSE.X = (int)X_AND_Y.x;
+			GRAPHIC->MOUSE.Y = (GRAPHIC->HEIGHT - (int)X_AND_Y.y);
 
-		X_AND_Y = MSG(CGPoint, EVENT, "locationInWindow");
-		GRAPHIC->MOUSE.X = (int)X_AND_Y.x;
-		GRAPHIC->MOUSE.Y = (GRAPHIC->HEIGHT - (int)X_AND_Y.y);
+			if (!!GRAPHIC->FUNCTION_MOUSE)
+				GRAPHIC->FUNCTION_MOUSE(\
+					GRAPHIC->MOUSE.X, \
+					GRAPHIC->MOUSE.Y, \
+					GRAPHIC->MOUSE.VALUE, \
+					GRAPHIC->FUNCTION_MOUSE_ARG\
+				);
 
-		if (!!GRAPHIC->FUNCTION_MOUSE)
-			GRAPHIC->FUNCTION_MOUSE(\
-				GRAPHIC->MOUSE.X, \
-				GRAPHIC->MOUSE.Y, \
-				GRAPHIC->MOUSE.VALUE, \
-				GRAPHIC->FUNCTION_MOUSE_ARG\
-			);
+			return ;
+			break ;
+		}
+		case (10): /* NSEventTypeKeyDown */
+		case (11): /* NSEventTypeKeyUp */
+		case (12): /* NSEventTypeFlagsChanged (AKA: Command, Option etc keys) */
+		{
+			register NSUInteger (KEY);
 
-		return (0);
-	}
-	else if (EVENT_TYPE == 10 /* NSEventTypeKeyDown */ \
-		|| EVENT_TYPE == 11 /* NSEventTypeKeyUp */ \
-		|| EVENT_TYPE == 12 /* SPECIAL KEY */)
-	{
-		register NSUInteger (KEY);
-
-		KEY = MSG(NSUInteger, EVENT, "keyCode");
-		switch (KEY)
-		{ // "switch case" is speed! Wrom wrommmm!!!
+			KEY = MSG(NSUInteger, GRAPHIC->EVENT, "keyCode");
+			switch (KEY)
+			{ // "switch case" is speed! Wrom wrommmm!!!
 			case 0:
 				GRAPHIC->KEY.A = (EVENT_TYPE == 10);
 				if (EVENT_TYPE == 10)
@@ -836,23 +900,28 @@ static int
 				else
 					GRAPHIC->KEY.UP = 0;
 				break ;
-		}
+			}
 
-		if (EVENT_TYPE == 10)
+			if (EVENT_TYPE == 10)
+			{
+				if (!!GRAPHIC->FUNCTION_KEY_DOWN)
+					GRAPHIC->FUNCTION_KEY_DOWN(GRAPHIC->KEY.DOWN, \
+						GRAPHIC->FUNCTION_KEY_DOWN_ARG);
+			}
+			else if (!!GRAPHIC->FUNCTION_KEY_UP)
+				GRAPHIC->FUNCTION_KEY_UP(GRAPHIC->KEY.UP, \
+					GRAPHIC->FUNCTION_KEY_UP_ARG);
+
+			return ;
+			break ;
+		}
+		default :
 		{
-			if (!!GRAPHIC->FUNCTION_KEY_DOWN)
-				GRAPHIC->FUNCTION_KEY_DOWN(GRAPHIC->KEY.DOWN, \
-					GRAPHIC->FUNCTION_KEY_DOWN_ARG);
+			return ;
 		}
-		else if (!!GRAPHIC->FUNCTION_KEY_UP)
-			GRAPHIC->FUNCTION_KEY_UP(GRAPHIC->KEY.UP, \
-				GRAPHIC->FUNCTION_KEY_UP_ARG);
-
-		return (0);
-	} /* EVENT_TYPE == 10 || EVENT_TYPE == 11 */
-
-	MSG1(void, NSApp, "sendEvent:", id, EVENT);
-	return (0);
+	}
+	
+	return ;
 }
 #else
 #	error "Please do not include this header directly!"

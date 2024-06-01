@@ -16,9 +16,22 @@ int
 
 	graphic = arg;
 
-	if (graphic->mouse.x - 15 >= 0 && graphic->mouse.x - 15 < graphic->width && \
-		graphic->mouse.y - 15 >= 0 && graphic->mouse.y - 15 < graphic->height)
-		put_pixel(graphic, graphic->mouse.x - 15, graphic->mouse.y - 15, 0XFF0000);
+	static int i = 0;
+	static int j = 0;
+	register int x;
+	register int y;
+
+	y = -1;
+	while (++y, y < graphic->height)
+	{
+		x = -1;
+		while (++x, x < graphic->width)
+		{
+			put_pixel(graphic, x, y, 0XFF0000 - (i + j));
+			j++;
+		}
+		++i;
+	}
 
 	if (graphic->key.esc)
 		window_close(graphic);

@@ -64,8 +64,6 @@ void
 		free(GRAPHIC->BUFFER);
 		GRAPHIC->BUFFER = ((void *)0);
 	}
-
-	GRAPHIC->WINDOW_EXIST = 0;
 }
 #else
 #	error "Please do not include this header directly!"

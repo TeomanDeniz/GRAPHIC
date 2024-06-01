@@ -337,9 +337,12 @@ struct GRAPHIC
 	(unsigned int, unsigned int, unsigned char, void *);
 	void                          *(FUNCTION_MOUSE_ARG);
 	unsigned int                       (FPS_START_TIME);
-	unsigned char                        (WINDOW_EXIST);
 #	if defined(__APPLE__)
 	id                                  (WINDOW_MODULE);
+	id                                          (EVENT);
+	void                                    *(TIMER_ID);
+	void                                 *(OBSERVER_ID);
+
 #	else
 #		ifdef _WIN32
 	HWND                                (WINDOW_HANDLE);
@@ -383,9 +386,11 @@ struct graphic
 	(unsigned int, unsigned int, unsigned char, void *);
 	void                          *(FUNCTION_MOUSE_ARG);
 	unsigned int                       (FPS_START_TIME);
-	unsigned char                        (WINDOW_EXIST);
 #	if defined(__APPLE__)
 	id                                  (WINDOW_MODULE);
+	id                                          (EVENT);
+	void                                    *(TIMER_ID);
+	void                                 *(OBSERVER_ID);
 #	else
 #		ifdef _WIN32
 	HWND                                (WINDOW_HANDLE);

@@ -132,7 +132,6 @@ register unsigned int HEIGHT)
 		return (-1);
 	}
 
-	GRAPHIC->WINDOW_EXIST = 1;
 	return (0);
 }
 #else

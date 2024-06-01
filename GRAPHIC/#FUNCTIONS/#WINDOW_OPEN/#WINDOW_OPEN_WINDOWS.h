@@ -166,7 +166,6 @@ register unsigned int HEIGHT)
 
 	ShowWindow(GRAPHIC->WINDOW_HANDLE, SW_NORMAL);
 	UpdateWindow(GRAPHIC->WINDOW_HANDLE);
-	GRAPHIC->WINDOW_EXIST = 1;
 	return (0);
 }
 

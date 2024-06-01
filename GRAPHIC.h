@@ -74,6 +74,10 @@ int
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 /* *************************** [v] FUNCTIONS [v] **************************** */
+#	include "GRAPHIC/#FUNCTIONS/#WINDOW_CLOSE/#WINDOW_CLOSE.h" /*
+#	 define window_close(struct graphic *)
+#	   void WINDOW_CLOSE(struct GRAPHIC *);
+#	        */
 #	include "GRAPHIC/#FUNCTIONS/#GRAPHIC_TIME/#GRAPHIC_TIME.h" /*
 #	 define graphic_time
 #	   long GRAPHIC_TIME(void);
@@ -103,10 +107,6 @@ v	>>>>>>> (struct graphic)
 #	include "GRAPHIC/#FUNCTIONS/#PUT_PIXEL.h" /*
 #	 define PUT_PIXEL(struct GRAPHIC *, int, int, uint)
 #	 define put_pixel(struct graphic *, int, int, uint)
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#WINDOW_CLOSE/#WINDOW_CLOSE.h" /*
-#	 define window_close(struct graphic *)
-#	   void WINDOW_CLOSE(struct GRAPHIC *);
 #	        */
 #	include "GRAPHIC/#FUNCTIONS/#WINDOW_OPEN/#WINDOW_OPEN.h" /*
 #	 define window_open(struct graphic *, uint, uint)

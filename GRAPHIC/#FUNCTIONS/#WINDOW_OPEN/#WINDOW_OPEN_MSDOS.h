@@ -17,8 +17,8 @@
 #	include "../../#STRUCT.h" /*
 #	 struct GRAPHIC;
 #	        */
-#	include "../../CMT/KEYWORDS/UNUSED.h" /*
-#	 define NOPE
+#	include "../../CMT/KEYWORDS/IGNORE.h" /*
+#	 define IGNORE
 #	        */
 #	include <dpmi.h> /*
 #	typedef __dpmi_regs;
@@ -38,14 +38,13 @@ void
 	register int     (HEIGHT);
 #	endif /* __STDC__ */
 {
-	NOPE WIDTH;
-	NOPE HEIGHT;
+	IGNORE WIDTH;
+	IGNORE HEIGHT;
 
 	__dpmi_regs (__REGISTER__);
 
 	__REGISTER__.x.ax = 19; /* 0X13 | 13H */
 	__dpmi_int(0X10, &__REGISTER__);
-	GRAPHIC->WINDOW_EXIST = 1;
 }
 #else
 #	error "Please do not include this header directly!"
