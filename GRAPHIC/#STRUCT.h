@@ -19,6 +19,13 @@
 #		include <objc/NSObjCRuntime.h> /*
 #		typedef id;
 #		        */
+#		include <pthread.h> /*
+#		typedef pthread_mutex_t;
+#		typedef pthread_t;
+#		        */
+#		include <CoreGraphics/CoreGraphics.h> /*
+#		typedef CGRect;
+#		        */
 #	else
 #		ifdef _WIN32
 #			include <windows.h> /*
@@ -30,7 +37,6 @@
 				defined(__FreeBSD__) || defined(__NetBSD__) || \
 				defined(__OpenBSD__) || defined(__DragonFly__) || \
 				defined(__sun)) /* __sun IS SOLARIS SYSTEMS */
-//#				 define Window
 #				include <X11/Xlib.h> /*
 #				typedef Display;
 #				typedef GC;
@@ -339,10 +345,15 @@ struct GRAPHIC
 	unsigned int                       (FPS_START_TIME);
 #	if defined(__APPLE__)
 	id                                  (WINDOW_MODULE);
+	pthread_mutex_t                (CLOSE_THREAD_MUTEX);
 	id                                          (EVENT);
 	void                                    *(TIMER_ID);
 	void                                 *(OBSERVER_ID);
-
+	pthread_t                    (THREAD_UPDATE_WINDOW);
+	CGRect                                (CANVAS_INFO);
+	CGColorSpaceRef                       (COLOR_SPACE);
+	CGDataProviderRef                  (IMAGE_PROVIDER);
+	char                                 (CLOSE_THREAD); // BOOL
 #	else
 #		ifdef _WIN32
 	HWND                                (WINDOW_HANDLE);
@@ -388,9 +399,15 @@ struct graphic
 	unsigned int                       (FPS_START_TIME);
 #	if defined(__APPLE__)
 	id                                  (WINDOW_MODULE);
+	pthread_mutex_t                (CLOSE_THREAD_MUTEX);
 	id                                          (EVENT);
 	void                                    *(TIMER_ID);
 	void                                 *(OBSERVER_ID);
+	pthread_t                    (THREAD_UPDATE_WINDOW);
+	CGRect                                (CANVAS_INFO);
+	CGColorSpaceRef                       (COLOR_SPACE);
+	CGDataProviderRef                  (IMAGE_PROVIDER);
+	char                                 (CLOSE_THREAD); // BOOL
 #	else
 #		ifdef _WIN32
 	HWND                                (WINDOW_HANDLE);

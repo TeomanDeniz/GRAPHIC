@@ -14,8 +14,9 @@
 
 #ifdef GRAPHIC_FUNCTIONS__WINDOW_OPEN_H
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../../#STRUCT.h" /*
+#	include "../../../GRAPHIC.h" /*
 #	 struct GRAPHIC;
+#	   void WINDOW_CLOSE(struct GRAPHIC *);
 #	        */
 #	include "../../CMT/KEYWORDS/INLINE.h" /*
 #	 define INLINE
@@ -47,6 +48,7 @@ G	^^^^^^^ *NSApp;
 #	  Class objc_allocateClassPair(Class, char *, size_t);
 #	   BOOL class_addMethod(Class, SEL, IMP, char *);
 #	   void objc_registerClassPair(Class);
+#	   void objc_disposeClassPair(Class);
 #	   void objc_setAssociatedObject(id, void *, id, objc_AssociationPolicy);
 #	     id objc_getAssociatedObject(id, void *);
 #	        */
@@ -72,10 +74,12 @@ v	>>>>>>> (CGImageRef)
 #	^^^^^^^ CGImageCreate(size_t, size_t, size_t, size_t, size_t,
 >	        CGColorSpaceRef, CGBitmapInfo, CGDataProviderRef, CGFloat *, bool,
 >	        CGColorRenderingIntent);
-#	   void CGColorSpaceRelease(CGColorSpaceRef);
-#	   void CGDataProviderRelease(CGDataProviderRef);
 #	   void CGContextDrawImage(CGContextRef, CGRect, CGImageRef);
 #	   void CGImageRelease(CGImageRef);
+#	        */
+#	include <pthread.h> /*
+#	    int pthread_mutex_init(pthread_mutex_t *, pthread_mutexattr_t *);
+#	    int pthread_mutex_destroy(pthread_mutex_t *);
 #	        */
 #	include "../../CMT/KEYWORDS/IGNORE.h" /*
 #	 define IGNORE
@@ -188,6 +192,13 @@ register unsigned int HEIGHT)
 	if (!GRAPHIC->BUFFER)
 		return (-1);
 
+	if (pthread_mutex_init(&GRAPHIC->CLOSE_THREAD_MUTEX, ((void *)0)))
+	{
+		free(GRAPHIC->BUFFER);
+		GRAPHIC->BUFFER = ((void *)0);
+		return (-1);
+	}
+
 	PREFETCH_RANGE(GRAPHIC->BUFFER, WIDTH * HEIGHT);
 	GRAPHIC->WIDTH = WIDTH;
 	GRAPHIC->HEIGHT = HEIGHT;
@@ -220,6 +231,7 @@ register unsigned int HEIGHT)
 	{
 		free(GRAPHIC->BUFFER);
 		GRAPHIC->BUFFER = ((void *)0);
+		pthread_mutex_destroy(&GRAPHIC->CLOSE_THREAD_MUTEX);
 		return (-1);
 	}
 
@@ -231,8 +243,7 @@ register unsigned int HEIGHT)
 
 	if (!VOYAGER)
 	{
-		free(GRAPHIC->BUFFER);
-		GRAPHIC->BUFFER = ((void *)0);
+		WINDOW_CLOSE(GRAPHIC);
 		return (-1);
 	}
 
@@ -266,8 +277,7 @@ register unsigned int HEIGHT)
 
 	if (!VIEW_CLASS)
 	{
-		free(GRAPHIC->BUFFER);
-		GRAPHIC->BUFFER = ((void *)0);
+		WINDOW_CLOSE(GRAPHIC);
 		return (-1);
 	}
 
@@ -290,8 +300,8 @@ register unsigned int HEIGHT)
 
 	if (!VIEW)
 	{
-		free(GRAPHIC->BUFFER);
-		GRAPHIC->BUFFER = ((void *)0);
+		objc_disposeClassPair(VIEW_CLASS);
+		WINDOW_CLOSE(GRAPHIC);
 		return (-1);
 	}
 
@@ -309,26 +319,48 @@ register unsigned int HEIGHT)
 		const char *, \
 		GRAPHIC->TITLE\
 	);
+	GRAPHIC->COLOR_SPACE = CGColorSpaceCreateDeviceRGB();
+
+	if (!GRAPHIC->COLOR_SPACE)
+	{
+		WINDOW_CLOSE(GRAPHIC);
+		return (-1);
+	}
+
+	GRAPHIC->IMAGE_PROVIDER = CGDataProviderCreateWithData(\
+		((void *)0), \
+		GRAPHIC->BUFFER, \
+		GRAPHIC->WIDTH * GRAPHIC->HEIGHT * 4, \
+		((void *)0)\
+	);
+
+	if (!GRAPHIC->IMAGE_PROVIDER)
+	{
+		WINDOW_CLOSE(GRAPHIC);
+		return (-1);
+	}
+
 	MSG1(void, GRAPHIC->WINDOW_MODULE, "setTitle:", id, TITLE);
 	MSG1(void, GRAPHIC->WINDOW_MODULE, "makeKeyAndOrderFront:", id, nil);
 	MSG(void, GRAPHIC->WINDOW_MODULE, "center");
 	MSG1(void, NSApp, "activateIgnoringOtherApps:", BOOL, YES);
+	GRAPHIC->CANVAS_INFO = CGRectMake(0, 0, GRAPHIC->WIDTH, GRAPHIC->HEIGHT);
 	return (0);
 }
 
 extern INLINE void
 	GRAPHIC_DRAW_RECT(const id VIEW, const SEL SELECTOR, const CGRect RECT)
 {
+	static struct GRAPHIC *(GRAPHIC) = ((void *)0);
+	CGContextRef           (CONTEXT);
+	CGImageRef               (IMAGE);
+
 	IGNORE RECT;
 	IGNORE SELECTOR;
 
-	struct GRAPHIC    *(GRAPHIC);
-	CGContextRef       (CONTEXT);
-	CGColorSpaceRef      (SPACE);
-	CGDataProviderRef (PROVIDER);
-	CGImageRef           (IMAGE);
+	if (!GRAPHIC)
+		GRAPHIC = (struct GRAPHIC *)objc_getAssociatedObject(VIEW, "GRAPHIC");
 
-	GRAPHIC = (struct GRAPHIC *)objc_getAssociatedObject(VIEW, "GRAPHIC");
 	CONTEXT = MSG(\
 		CGContextRef, \
 		MSG(\
@@ -338,39 +370,25 @@ extern INLINE void
 		), \
 		"graphicsPort"\
 	);
-	SPACE = CGColorSpaceCreateDeviceRGB();
-	PROVIDER = CGDataProviderCreateWithData(\
-		NULL, \
-		GRAPHIC->BUFFER, \
-		GRAPHIC->WIDTH * GRAPHIC->HEIGHT * 4, \
-		NULL\
-	);
 	IMAGE = CGImageCreate(\
 		GRAPHIC->WIDTH, \
 		GRAPHIC->HEIGHT, \
 		8, \
 		32, \
-		GRAPHIC->WIDTH * 4, \
-		SPACE, \
+		GRAPHIC->WIDTH << 2, \
+		GRAPHIC->COLOR_SPACE, \
 		(\
 			kCGImageAlphaNoneSkipFirst | \
 			kCGBitmapByteOrder32Little\
 		), \
-		PROVIDER, \
-		NULL, \
+		GRAPHIC->IMAGE_PROVIDER, \
+		((void *)0), \
 		false, \
 		kCGRenderingIntentDefault\
 	);
-	CGColorSpaceRelease(SPACE);
-	CGDataProviderRelease(PROVIDER);
 	CGContextDrawImage(\
 		CONTEXT, \
-		CGRectMake(\
-			0, \
-			0, \
-			GRAPHIC->WIDTH, \
-			GRAPHIC->HEIGHT\
-		), \
+		GRAPHIC->CANVAS_INFO, \
 		IMAGE\
 	);
 	CGImageRelease(IMAGE);

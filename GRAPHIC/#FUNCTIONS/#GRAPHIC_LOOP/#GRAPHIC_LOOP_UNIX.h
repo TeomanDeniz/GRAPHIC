@@ -24,6 +24,8 @@
 #	    int XFlush(Display *);
 #	    int XPending(Display *);
 #	    int XNextEvent(Display *, XEvent *);
+#	   Atom XInternAtom(Display *, char *, Bool);
+#	    int XCloseDisplay(Display *);
 #	        */
 #	include <X11/XKBlib.h> /*
 #	 KeySym XkbKeycodeToKeysym(Display *, [kc], int, int);
@@ -62,6 +64,9 @@
 #	 define XK_6           #	 define XK_7
 #	 define XK_8           #	 define XK_9
 #	 define XK_section
+#	        */
+#	include <stdlib.h> /*
+#	   void free(void *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 /* *************************** [v] PROTOTYPES [v] *************************** */

@@ -14,13 +14,30 @@
 
 #ifdef GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_H
 /* **************************** [v] INCLUDES [v] **************************** */
+#	include <CoreFoundation/CoreFoundation.h> /*
+#	 struct CFRunLoopActivity;
+#	 struct CFRunLoopTimerContext;
+#	typedef CFRunLoopObserverRef;
+#	typedef CFRunLoopTimerRef;
+v	 >>>>>> (CFRunLoopTimerRef)
+#	 ^^^^^^ CFRunLoopTimerCreate(CFAllocatorRef, CFAbsoluteTime, CFTimeInterval,
+>	        CFOptionFlags, CFIndex, void (*f)(CFRunLoopTimerRef, void *),
+>	        CFRunLoopTimerContext *);
+#	   void CFRunLoopAddTimer(CFRunLoopRef, CFRunLoopTimerRef, CFStringRef);
+v	 >>>>>> (CFRunLoopRef)
+#	 ^^^^^^ CFRunLoopGetMain(void);
+#	        */
 #	include "../../../GRAPHIC.h" /*
 #	 struct GRAPHIC;
 #      void WINDOW_CLOSE(struct GRAPHIC *);
 #	        */
+#	include "../../CMT/KEYWORDS/IGNORE.h" /*
+#	 define IGNORE
+#	        */
 #	include <objc/objc-runtime.h> /*
 #	typedef *SEL;
 #	    SEL sel_getUid(const char *);
+#	  Class objc_getClass(const char *);
 #	        */
 #	include <objc/NSObjCRuntime.h> /*
 #	 define YES
@@ -34,19 +51,11 @@ G	^^^^^^^ *NSApp;
 #	include <CoreGraphics/CoreGraphics.h> /*
 #	typedef CGPoint;
 #	        */
-#	include <CoreFoundation/CoreFoundation.h> /*
-#	 struct CFRunLoopTimerContext;
-#	typedef CFRunLoopTimerRef;
-v	 >>>>>> (CFRunLoopTimerRef)
-#	 ^^^^^^ CFRunLoopTimerCreate(CFAllocatorRef, CFAbsoluteTime, CFTimeInterval,
->	        CFOptionFlags, CFIndex, void (*f)(CFRunLoopTimerRef, void *),
->	        CFRunLoopTimerContext *);
-#	   void CFRunLoopAddTimer(CFRunLoopRef, CFRunLoopTimerRef, CFStringRef);
-v	 >>>>>> (CFRunLoopRef)
-#	 ^^^^^^ CFRunLoopGetMain(void);
-#	        */
-#	include "../../CMT/KEYWORDS/IGNORE.h" /*
-#	 define IGNORE
+#	include <pthread.h> /*
+#	    int pthread_create(pthread_t *, pthread_attr_t *, void *(*f)(void *),
+>	        void *);
+#	    int pthread_mutex_lock(pthread_mutex_t *);
+#	    int pthread_mutex_unlock(pthread_mutex_t *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 /* ************************ [v] GLOBAL VARIABLES [v] ************************ */
@@ -131,21 +140,18 @@ extern id const NSApp;
 			__MSG4_d__\
 		)
 #	endif /* MSG4 */
+#	ifndef REFRESH_SCREEN
+#		define REFRESH_SCREEN(__REFRESH_SCREEN_PARAMTER__) (\
+			(id)objc_getClass(__REFRESH_SCREEN_PARAMTER__)\
+		)
+#	endif /* REFRESH_SCREEN */
 /* ************************* [^] HELPER MACROS [^] ************************** */
 /* *************************** [v] PROTOTYPES [v] *************************** */
 static void	__GRAPHIC_LOOP__(CFRunLoopObserverRef OBSERVER, \
 CFRunLoopActivity ACTIVITY, void *ARG);
 static void	__TIMER_LOOP__(CFRunLoopTimerRef OBSERVER, void *ARG);
+static void	*__THREAD_UPDATE_WINDOW__(void *ARG);
 /* *************************** [^] PROTOTYPES [^] *************************** */
-
-static void /* Thank you MiniLibX!!! You saved my life! <3 <3 */
-	__TIMER_LOOP__(CFRunLoopTimerRef OBSERVER, void *ARG)
-{
-	IGNORE OBSERVER;
-
-	((struct GRAPHIC *)ARG)->\
-		FUNCTION_LOOP(((struct GRAPHIC *)ARG)->FUNCTION_LOOP_ARG);
-}
 
 int
 	GRAPHIC_LOOP(struct GRAPHIC *GRAPHIC)
@@ -154,6 +160,7 @@ int
 	CFRunLoopTimerRef                (TIMER_ID);
 	CFRunLoopObserverContext (OBSERVER_CONTEXT);
 	CFRunLoopObserverRef          (OBSERVER_ID);
+	Class                             (NS_DATE);
 
 	if (!!GRAPHIC->FUNCTION_LOOP)
 	{
@@ -173,14 +180,37 @@ int
 	OBSERVER_CONTEXT.retain = ((void *)0);
 	OBSERVER_CONTEXT.release = ((void *)0);
 	OBSERVER_CONTEXT.copyDescription = ((void *)0);
-	OBSERVER_ID = CFRunLoopObserverCreate(NULL, kCFRunLoopBeforeTimers, true, \
-		0, __GRAPHIC_LOOP__, &OBSERVER_CONTEXT);
+	OBSERVER_ID = CFRunLoopObserverCreate(((void *)0), kCFRunLoopBeforeTimers, \
+		true, 0, __GRAPHIC_LOOP__, &OBSERVER_CONTEXT);
 	GRAPHIC->OBSERVER_ID = OBSERVER_ID;
 	CFRunLoopAddObserver(CFRunLoopGetMain(), OBSERVER_ID, \
 		kCFRunLoopCommonModes);
+	NS_DATE = ((Class(*)(Class, SEL, double))objc_msgSend)\
+		(objc_getClass("NSDate"), \
+		sel_getUid("dateWithTimeIntervalSinceNow:"), 0.1);
+
+	if (pthread_create(&GRAPHIC->THREAD_UPDATE_WINDOW, ((void *)0), \
+		__THREAD_UPDATE_WINDOW__, GRAPHIC))
+	{
+		WINDOW_CLOSE(GRAPHIC);
+		return (-1);
+	}
 
 	while (!!GRAPHIC->WINDOW_MODULE)
 	{
+		GRAPHIC->EVENT = MSG4(\
+			id, \
+			NSApp, \
+			"nextEventMatchingMask:untilDate:inMode:dequeue:", \
+			NSUInteger, \
+			NSUIntegerMax, \
+			Class, \
+			NS_DATE, \
+			id, \
+			NSDefaultRunLoopMode, \
+			BOOL, \
+			YES\
+		);
 		MSG1(\
 			void, \
 			MSG(\
@@ -192,24 +222,12 @@ int
 			BOOL, \
 			YES\
 		);
-		GRAPHIC->EVENT = MSG4(\
-			id, \
-			NSApp, \
-			"nextEventMatchingMask:untilDate:inMode:dequeue:", \
-			NSUInteger, \
-			NSUIntegerMax, \
-			id, \
-			NULL, \
-			id, \
-			NSDefaultRunLoopMode, \
-			BOOL, \
-			YES\
-		);
 
 		if (!GRAPHIC->EVENT)
 			continue ;
 
-		MSG1(void, NSApp, "sendEvent:", id, GRAPHIC->EVENT); // Do next event
+		MSG1(void, NSApp, "sendEvent:", id, GRAPHIC->EVENT); // DO NEXT EVENT
+		//MSG(void, NSApp, "updateWindows");
 	}
 
 	return (0);
@@ -922,6 +940,87 @@ CFRunLoopActivity ACTIVITY, void *ARG)
 	}
 	
 	return ;
+}
+
+static void /* Thank you MiniLibX!!! You saved my life! <3 <3 */
+	__TIMER_LOOP__(CFRunLoopTimerRef OBSERVER, void *ARG)
+{
+	IGNORE OBSERVER;
+
+	((struct GRAPHIC *)ARG)->\
+		FUNCTION_LOOP(((struct GRAPHIC *)ARG)->FUNCTION_LOOP_ARG);
+		MSG1(\
+			void, \
+			MSG(\
+				id, \
+				((struct GRAPHIC *)ARG)->WINDOW_MODULE, \
+				"contentView"\
+			), \
+			"setNeedsDisplay:", \
+			BOOL, \
+			YES\
+		);
+}
+
+static void
+	*__THREAD_UPDATE_WINDOW__(void *ARG)
+{
+	struct GRAPHIC *(GRAPHIC);
+	CGContextRef    (CONTEXT);
+	CGImageRef        (IMAGE);
+	id                 (NSGC);
+
+	GRAPHIC = (struct GRAPHIC *)ARG;
+	pthread_mutex_lock(&GRAPHIC->CLOSE_THREAD_MUTEX);
+	NSGC = REFRESH_SCREEN("NSGraphicsContext");
+
+	while (!GRAPHIC->CLOSE_THREAD)
+	{
+		pthread_mutex_unlock(&GRAPHIC->CLOSE_THREAD_MUTEX);
+		CONTEXT = MSG(\
+			CGContextRef, \
+			MSG(\
+				id, \
+				NSGC, \
+				"currentContext"\
+			), \
+			"graphicsPort"\
+		);
+
+		IMAGE = CGImageCreate(\
+			GRAPHIC->WIDTH, \
+			GRAPHIC->HEIGHT, \
+			8, \
+			32, \
+			(GRAPHIC->WIDTH << 2), \
+			GRAPHIC->COLOR_SPACE, \
+			(\
+				kCGImageAlphaNoneSkipFirst | \
+				kCGBitmapByteOrder32Little\
+			), \
+			GRAPHIC->IMAGE_PROVIDER, \
+			((void *)0), \
+			false, \
+			kCGRenderingIntentDefault\
+		);
+
+		if (!IMAGE)
+		{
+			pthread_mutex_lock(&GRAPHIC->CLOSE_THREAD_MUTEX);
+			continue ;
+		}
+
+		CGContextDrawImage(\
+			CONTEXT, \
+			GRAPHIC->CANVAS_INFO, \
+			IMAGE\
+		);
+		CGImageRelease(IMAGE);
+		pthread_mutex_lock(&GRAPHIC->CLOSE_THREAD_MUTEX);
+	}
+
+	pthread_mutex_unlock(&GRAPHIC->CLOSE_THREAD_MUTEX);
+	return ((void *)0);
 }
 #else
 #	error "Please do not include this header directly!"
