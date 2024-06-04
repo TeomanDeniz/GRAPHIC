@@ -8,11 +8,11 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - AGPL-3.0  :: Update - 2024/05/20 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2024/06/04 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__WINDOW_TITLE_H
+#ifdef GRAPHIC_FUNCTIONS__WINDOW_TITLE_C
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "../../#STRUCT.h" /*
 #	 struct GRAPHIC;
@@ -40,4 +40,4 @@ UNUSED int
 }
 #else
 #	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__WINDOW_TITLE_H */
+#endif /* GRAPHIC_FUNCTIONS__WINDOW_TITLE_C */

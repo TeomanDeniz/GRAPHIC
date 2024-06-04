@@ -8,14 +8,18 @@
 
 
 void
-	GRAPHIC_FPS(struct GRAPHIC *WINDOW, unsigned int FPS)
+	GRAPHIC_FPS(struct GRAPHIC *GRAPHIC, unsigned int FPS)
 {
-	unsigned long long (time);
+	unsigned int       (LOOP_FPS); // TO THE STRUCT
+	unsigned long long (NEW_TIME);
 
-	time = GRAPHIC_TIME();
-	if (time - WINDOW->FPS_START_TIME < 1000 / FPS)
-		GRAPHIC_SLEEP(time - WINDOW->FPS_START_TIME);
-	WINDOW->FPS_START_TIME = time;
+	NEW_TIME = GRAPHIC_TIME();
+	LOOP_FPS = 1000 / FPS;
+
+	if (NEW_TIME - GRAPHIC->FPS_START_TIME < LOOP_FPS)
+		GRAPHIC_SLEEP(NEW_TIME - GRAPHIC->FPS_START_TIME);
+
+	GRAPHIC->FPS_START_TIME = NEW_TIME;
 }
 
 void graphic_rect(struct GRAPHIC *WINDOW, int x, int y, int w, int h,
@@ -35,9 +39,12 @@ void graphic_rect(struct GRAPHIC *WINDOW, int x, int y, int w, int h,
 static unsigned short font5x3[95] = {
 	0B\
 	0000\
+	0000 << 8\
+	0B\
 	0000\
-	0000\
-	0000, 0X2092, 0X002d, 0X5f7d, 0X279e,
+	0000,
+
+	0X2092, 0X002d, 0X5f7d, 0X279e,
 	0X52a5, 0X7ad6, 0X0012, 0X4494, 0X1491,
 	0X017a, 0X05d0, 0X1400, 0X01c0, 0X0400,
 	0X12a4, 0X2b6a, 0X749a, 0X752a, 0X38a3,

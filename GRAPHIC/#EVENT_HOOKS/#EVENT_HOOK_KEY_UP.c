@@ -1,5 +1,5 @@
 /******************************************************************************\
-# H - GRAPHIC/#FUNCIONS/#GRAPHIC_INIT            #       Maximum Tension       #
+# H - GRAPHIC/#EVENT_HOOKS/#KEY_UP               #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -12,33 +12,27 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifndef GRAPHIC_FUNCTIONS__GRAPHIC_INIT_H
-#	define GRAPHIC_FUNCTIONS__GRAPHIC_INIT_H 202405
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../../GRAPHIC.h" /*
+#	include "../#STRUCT.h" /*
 #	 struct GRAPHIC;
-#	   void GRAPHIC_SETUP(struct GRAPHIC *);
-#	        */
-#	include <stdlib.h> /*
-#	   void *malloc(size_t);
+#	 struct graphic;
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
-struct GRAPHIC
-	*GRAPHIC_INIT(void)
-{
-	struct GRAPHIC	*GRAPHIC;
 
-	GRAPHIC = (struct GRAPHIC *)malloc(sizeof(struct GRAPHIC));
-	if (!GRAPHIC)
-		return ((void *)0);
-	GRAPHIC_SETUP(GRAPHIC);
-	return (GRAPHIC);
-}
-/* ***************************** [V] LOWERCASE [V] ************************** */
-struct graphic
-	*graphic_init(void)
+void
+	EVENT_HOOK_KEY_UP(struct GRAPHIC *GRAPHIC, int (*F)(unsigned int, void *), \
+void *ARG)
 {
-	return ((struct graphic *)GRAPHIC_INIT());
+	GRAPHIC->FUNCTION_KEY_UP = F;
+	GRAPHIC->FUNCTION_KEY_UP_ARG = ARG;
+}
+
+/* ***************************** [V] LOWERCASE [V] ************************** */
+void
+	event_hook_key_up(struct graphic *graphic, int (*f)(unsigned int, void *), \
+void *arg)
+{
+	graphic->FUNCTION_KEY_UP = f;
+	graphic->FUNCTION_KEY_UP_ARG = arg;
 }
 /* ***************************** [^] LOWERCASE [^] ************************** */
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_INIT_H */

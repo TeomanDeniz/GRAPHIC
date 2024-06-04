@@ -1,5 +1,5 @@
 /******************************************************************************\
-# H - GRAPHIC/#EVENT_HOOKS/#KEY_UP               #       Maximum Tension       #
+# C - GRAPHIC/#FUNCIONS/#GRAPHIC_INIT            #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -12,28 +12,34 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifndef EVENT_HOOK_KEY_UP_H
-#	define EVENT_HOOK_KEY_UP_H 202405
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../#STRUCT.h" /*
+#	include "../../GRAPHIC.h" /*
 #	 struct GRAPHIC;
-#	 struct graphic;
+#	   void GRAPHIC_SETUP(struct GRAPHIC *);
+#	        */
+#	include <stdlib.h> /*
+#	   void *malloc(size_t);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 void
-	EVENT_HOOK_KEY_UP(struct GRAPHIC *GRAPHIC, int (*F)(unsigned int, void *), \
-void *ARG)
+	*GRAPHIC_INIT(void)
 {
-	GRAPHIC->FUNCTION_KEY_UP = F;
-	GRAPHIC->FUNCTION_KEY_UP_ARG = ARG;
+	struct GRAPHIC	*GRAPHIC;
+
+	GRAPHIC = (struct GRAPHIC *)malloc(sizeof(struct GRAPHIC));
+
+	if (!GRAPHIC)
+		return ((void *)0);
+
+	GRAPHIC_SETUP(GRAPHIC);
+	return ((void *)GRAPHIC);
 }
+
 /* ***************************** [V] LOWERCASE [V] ************************** */
 void
-	event_hook_key_up(struct graphic *GRAPHIC, int (*F)(unsigned int, void *), \
-void *ARG)
+	*graphic_init(void)
 {
-	GRAPHIC->FUNCTION_KEY_UP = F;
-	GRAPHIC->FUNCTION_KEY_UP_ARG = ARG;
+	return (GRAPHIC_INIT());
 }
 /* ***************************** [^] LOWERCASE [^] ************************** */
-#endif /* EVENT_HOOK_KEY_UP_H */

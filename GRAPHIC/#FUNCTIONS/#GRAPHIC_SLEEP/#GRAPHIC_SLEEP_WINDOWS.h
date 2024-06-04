@@ -12,7 +12,7 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_H
+#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_C
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "../../CMT/ATTRIBUTES/REGPARM.h" /*
 #	 define REGPARM()
@@ -28,4 +28,4 @@ void REGPARM(1)
 }
 #else
 #	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_H */
+#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_C */

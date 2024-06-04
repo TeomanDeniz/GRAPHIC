@@ -8,11 +8,11 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2024/06/04 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_H
+#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include <CoreFoundation/CoreFoundation.h> /*
 #	 struct CFRunLoopActivity;
@@ -1024,4 +1024,4 @@ static void
 }
 #else
 #	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_H */
+#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C */

@@ -12,7 +12,7 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__WINDOW_CLOSE_H
+#ifdef GRAPHIC_FUNCTIONS__WINDOW_CLOSE_C
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "../../#STRUCT.h" /*
 #	 struct GRAPHIC;
@@ -41,4 +41,4 @@ void
 }
 #else
 #	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__WINDOW_CLOSE_H */
+#endif /* GRAPHIC_FUNCTIONS__WINDOW_CLOSE_C */

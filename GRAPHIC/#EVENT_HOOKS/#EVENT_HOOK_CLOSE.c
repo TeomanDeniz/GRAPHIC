@@ -1,38 +1,36 @@
 /******************************************************************************\
-# H - GRAPHIC/#FUNCIONS/#GRAPHIC_SLEEP           #       Maximum Tension       #
+# C - GRAPHIC/#EVENT_HOOKS/#CLOSE                #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
 # maximum-tension.com                            #  ::                      :: #
 #                                                #  :!:    : :: : :  :  ::::!: #
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
-# : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
+# : C - Maximum Tension :: Create - 2024/05/23 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
 # : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifndef GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_H
-#	define GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_H 202405
-#	if (defined(__APPLE__) && !defined(X11))
-#		include "#GRAPHIC_SLEEP_MACOS.h"
-#	else
-#		ifdef _WIN32
-#			include "#GRAPHIC_SLEEP_WINDOWS.h"
-#		else /* DOS */
-#			ifdef __DJGPP__
-#				include "#GRAPHIC_SLEEP_MSDOS.h"
-#			else /* UNIX (PROBABLY) */
-#				if (defined(__linux__) || defined(__gnu_linux__) || \
-					defined(__FreeBSD__) || defined(__NetBSD__) || \
-					defined(__OpenBSD__) || defined(__DragonFly__) || \
-					defined(__sun) || defined(X11))
-#					include "#GRAPHIC_SLEEP_UNIX.h"
-#				endif /* UNIX */
-#			endif /* DJGPP (DOS) */
-#		endif /* WINDOWS */
-#	endif /* APPLE */
+/* **************************** [v] INCLUDES [v] **************************** */
+#include "../#STRUCT.h" /*
+# struct GRAPHIC;
+# struct graphic;
+#        */
+/* **************************** [^] INCLUDES [^] **************************** */
+
+void
+	EVENT_HOOK_CLOSE(struct GRAPHIC *GRAPHIC, int (*F)(void *), void *ARG)
+{
+	GRAPHIC->FUNCTION_CLOSE = F;
+	GRAPHIC->FUNCTION_CLOSE_ARG = ARG;
+}
+
 /* ***************************** [V] LOWERCASE [V] ************************** */
-#	define graphic_sleep GRAPHIC_SLEEP
+void
+	event_hook_close(struct graphic *graphic, int (*f)(void *), void *arg)
+{
+	graphic->FUNCTION_CLOSE = f;
+	graphic->FUNCTION_CLOSE_ARG = arg;
+}
 /* ***************************** [^] LOWERCASE [^] ************************** */
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_H */

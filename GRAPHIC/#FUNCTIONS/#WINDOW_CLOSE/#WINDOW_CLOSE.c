@@ -1,5 +1,5 @@
 /******************************************************************************\
-# H - GRAPHIC/#FUNCIONS/#GRAPHIC_SETUP           #       Maximum Tension       #
+# C - GRAPHIC/#FUNCIONS/#WINDOW_CLOSE            #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -12,36 +12,38 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifndef GRAPHIC_FUNCTIONS__GRAPHIC_SETUP_H
-#	define GRAPHIC_FUNCTIONS__GRAPHIC_SETUP_H 202405
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../../GRAPHIC.h" /*
-#	 struct GRAPHIC;
-#	    int WINDOW_TITLE(struct GRAPHIC *, char *);
-#	   long GRAPHIC_TIME(void);
-#	        */
+#include "../../#STRUCT.h" /*
+# struct graphic;
+# struct GRAPHIC;
+#        */
 /* **************************** [^] INCLUDES [^] **************************** */
-void
-	GRAPHIC_SETUP(struct GRAPHIC *GRAPHIC)
-{
-	register unsigned int  (INDEX);
-	register unsigned int (SIZEOF);
-	char         *(GRAPHIC_MEMORY);
 
-	if (!GRAPHIC)
-		return ;
+#define GRAPHIC_FUNCTIONS__WINDOW_CLOSE_C /* SEALER */
 
-	SIZEOF = sizeof(struct GRAPHIC);
-	GRAPHIC_MEMORY = (char *)GRAPHIC;
-	INDEX = (unsigned int)-1;
+#if (defined(__APPLE__) && !defined(X11))
+#	include "#WINDOW_CLOSE_MACOS.h"
+#else
+#	ifdef _WIN32
+#		include "#WINDOW_CLOSE_WINDOWS.h"
+#	else /* DOS */
+#		ifdef __DJGPP__
+#			include "#WINDOW_CLOSE_MSDOS.h"
+#		else /* UNIX (PROBABLY) */
+#			if (defined(__linux__) || defined(__gnu_linux__) || \
+				defined(__FreeBSD__) || defined(__NetBSD__) || \
+				defined(__OpenBSD__) || defined(__DragonFly__) || \
+				defined(__sun) || defined(X11))
+#				include "#WINDOW_CLOSE_UNIX.h"
+#			endif /* UNIX */
+#		endif /* DJGPP (DOS) */
+#	endif /* WINDOWS */
+#endif /* APPLE */
 
-	while (++INDEX, INDEX < SIZEOF)
-		GRAPHIC_MEMORY[INDEX] = 0;
-	WINDOW_TITLE(GRAPHIC, ((void *)0));
-	GRAPHIC->FPS_START_TIME = GRAPHIC_TIME();
-}
 /* ***************************** [V] LOWERCASE [V] ************************** */
-#	define graphic_setup(__graphic_setup_graphic__) \
-		GRAPHIC_SETUP((struct GRAPHIC *)__graphic_setup_graphic__)
+void
+	window_close(struct graphic *graphic)
+{
+	WINDOW_CLOSE((struct GRAPHIC *)graphic);
+}
 /* ***************************** [^] LOWERCASE [^] ************************** */
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_SETUP_H */

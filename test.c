@@ -45,7 +45,7 @@ int
 	struct graphic	graphic;
 
 	graphic_setup(&graphic);
-	window_open(&graphic, 3000, 1400);
+	window_open(&graphic, 1000, 754);
 	event_hook_loop(&graphic, test, (void *)&graphic);
 	graphic_loop(&graphic);
 	return (0);

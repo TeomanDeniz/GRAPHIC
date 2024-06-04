@@ -12,7 +12,7 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__WINDOW_OPEN_H
+#ifdef GRAPHIC_FUNCTIONS__WINDOW_OPEN_C
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "../../#STRUCT.h" /*
 #	 struct GRAPHIC;
@@ -136,4 +136,4 @@ register unsigned int HEIGHT)
 }
 #else
 #	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__WINDOW_OPEN_H */
+#endif /* GRAPHIC_FUNCTIONS__WINDOW_OPEN_C */

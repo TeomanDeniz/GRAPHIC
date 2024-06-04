@@ -58,7 +58,7 @@ int
 #	ifdef __cplusplus /* C++ */
 		extern "C" {
 #	endif /* __cplusplus */
-#	define GRAPHIC_H 202405 /* VERSION */
+#	define GRAPHIC_H 202406 /* VERSION */
 /* ************* [v] CHECK IF LIBRARY SUPPORTS THIS DEVICE [v] ************** */
 #	if !(defined(__APPLE__) || defined(__DJGPP__) || defined(_WIN32) || \
 		defined(__linux__) || defined(__gnu_linux__) || \
@@ -72,77 +72,155 @@ int
 #	 struct graphic;
 #	 struct GRAPHIC;
 #	        */
+#	ifdef __DJGPP__
+#		include <go32.h> /*
+#		 define _dos_ds;
+#		        */
+#		include <sys/farptr.h> /*
+#		   void _farpokeb(short, long, char);
+#		        */
+#	endif /* __DJGPP__ */
 /* **************************** [^] INCLUDES [^] **************************** */
+/* *************************** [v] PUT_PIXEL [v] **************************** */
+#	ifdef __DJGPP__
+#		define PUT_PIXEL(\
+			__PUT_PIXEL_GRAPHIC__, \
+			__PUT_PIXEL_X__, \
+			__PUT_PIXEL_Y__, \
+			__PUT_PIXEL_COLOR__\
+		) (\
+			_farpokeb(\
+				_dos_ds, \
+				0XA0000 + (__PUT_PIXEL_Y__ * 320) + __PUT_PIXEL_X__, \
+				__PUT_PIXEL_COLOR__\
+			);\
+		)
+#		define put_pixel(\
+			__put_pixel_graphic__, \
+			__put_pixel_x__, \
+			__put_pixel_y__, \
+			__put_pixel_color__\
+		) (\
+			_farpokeb(\
+				_dos_ds, \
+				0XA0000 + (__put_pixel_y__ * 320) + __put_pixel_x__, \
+				__put_pixel_color__\
+			);\
+		)
+#	else /* !__DJGPP__ */
+#		define PUT_PIXEL(\
+			__PUT_PIXEL_GRAPHIC__, \
+			__PUT_PIXEL_X__, \
+			__PUT_PIXEL_Y__, \
+			__PUT_PIXEL_COLOR__\
+		) (\
+			(\
+				(__PUT_PIXEL_GRAPHIC__)->BUFFER[\
+					(\
+						(__PUT_PIXEL_Y__) * (__PUT_PIXEL_GRAPHIC__)->WIDTH\
+					) + (__PUT_PIXEL_X__)\
+				]\
+			) = __PUT_PIXEL_COLOR__\
+		)
+#		define put_pixel(\
+			__put_pixel_graphic__, \
+			__put_pixel_x__, \
+			__PUT_PIXEL_Y__, \
+			__put_pixel_color__\
+		) (\
+			(\
+				(__put_pixel_graphic__)->buffer[\
+					(\
+						(__PUT_PIXEL_Y__) * (__put_pixel_graphic__)->width\
+					) + (__put_pixel_x__)\
+				]\
+			) = __put_pixel_color__\
+		)
+#	endif /* __DJGPP__ */
+/* *************************** [^] PUT_PIXEL [^] **************************** */
+
+#	ifdef __STDC__
 /* *************************** [v] FUNCTIONS [v] **************************** */
-#	include "GRAPHIC/#FUNCTIONS/#WINDOW_CLOSE/#WINDOW_CLOSE.h" /*
-#	 define window_close(struct graphic *)
-#	   void WINDOW_CLOSE(struct GRAPHIC *);
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#GRAPHIC_TIME/#GRAPHIC_TIME.h" /*
-#	 define graphic_time
-#	   long GRAPHIC_TIME(void);
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#GRAPHIC_SLEEP/#GRAPHIC_SLEEP.h" /*
-#	 define graphic_sleep(long)
-#	   void GRAPHIC_SLEEP(long);
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#WINDOW_TITLE/#WINDOW_TITLE.h" /*
-#	 define window_title(struct graphic *, char *)
-#	    int WINDOW_TITLE(struct GRAPHIC *, char *);
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#GRAPHIC_LOOP/#GRAPHIC_LOOP.h" /*
-#	 define graphic_loop(struct graphic *)
-#	    int GRAPHIC_LOOP(struct GRAPHIC *);
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#GRAPHIC_SETUP.h" /*
-#	 define graphic_setup(struct graphic *)
-#	   void GRAPHIC_SETUP(struct GRAPHIC *);
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#GRAPHIC_INIT.h" /*
-v	>>>>>>> (struct GRAPHIC)
-#	^^^^^^^ *GRAPHIC_INIT(void);
-v	>>>>>>> (struct graphic)
-#	^^^^^^^ *graphic_init(void);
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#PUT_PIXEL.h" /*
-#	 define PUT_PIXEL(struct GRAPHIC *, int, int, uint)
-#	 define put_pixel(struct graphic *, int, int, uint)
-#	        */
-#	include "GRAPHIC/#FUNCTIONS/#WINDOW_OPEN/#WINDOW_OPEN.h" /*
-#	 define window_open(struct graphic *, uint, uint)
-#	    int WINDOW_OPEN(struct GRAPHIC *, uint, uint);
-#	        */
+extern int	GRAPHIC_LOOP(struct GRAPHIC *GRAPHIC);
+extern int	graphic_loop(struct graphic *graphic);
+extern void	GRAPHIC_SLEEP(register long MILLISECONDS);
+extern void	graphic_sleep(register long milliseconds);
+extern long	GRAPHIC_TIME(void);
+extern long	graphic_time(void);
+extern void	WINDOW_CLOSE(struct GRAPHIC *GRAPHIC);
+extern void	window_close(struct graphic *graphic);
+extern int	WINDOW_OPEN(struct GRAPHIC *GRAPHIC, register unsigned int WIDTH, \
+register unsigned int HEIGHT);
+extern int	window_open(struct graphic *graphic, register unsigned int width, \
+register unsigned int height);
+extern int	WINDOW_TITLE(struct GRAPHIC *GRAPHIC, char *TITLE);
+extern int	window_title(struct graphic *graphic, char *title);
+extern void	*GRAPHIC_INIT(void);
+extern void	*graphic_init(void);
+extern void	GRAPHIC_SETUP(struct GRAPHIC *GRAPHIC);
+extern void	graphic_setup(struct graphic *graphic);
 /* *************************** [^] FUNCTIONS [^] **************************** */
 /* ************************** [v] EVENT HOOKS [v] *************************** */
-#	include "GRAPHIC/#EVENT_HOOKS/#EVENT_HOOK_KEY_DOWN.h" /*
-#	   void EVENT_HOOK_KEY_DOWN(struct GRAPHIC *, int (*f)(int, void *),
->	        void *);
-#	   void event_hook_key_down(struct graphic *, int (*f)(int, void *),
->	        void *);
-#	        */
-#	include "GRAPHIC/#EVENT_HOOKS/#EVENT_HOOK_KEY_UP.h" /*
-#	   void EVENT_HOOK_KEY_UP(struct GRAPHIC *, int (*f)(int, void *), void *);
-#	   void event_hook_key_up(struct graphic *, int (*f)(int, void *), void *);
-#	        */
-#	include "GRAPHIC/#EVENT_HOOKS/#EVENT_HOOK_CLOSE.h" /*
-#	   void EVENT_HOOK_CLOSE(struct GRAPHIC *, int (*f)(void *), void *);
-#	   void event_hook_close(struct graphic *, int (*f)(void *), void *);
-#	        */
-#	include "GRAPHIC/#EVENT_HOOKS/#EVENT_HOOK_LOOP.h" /*
-#	   void EVENT_HOOK_LOOP(struct GRAPHIC *, int (*f)(void *), void *);
-#	   void event_hook_loop(struct graphic *, int (*f)(void *), void *);
-#	        */
-#	include "GRAPHIC/#EVENT_HOOKS/#EVENT_HOOK_MOUSE.h" /*
-#	   void EVENT_HOOK_MOUSE(struct GRAPHIC *, \
->	        int (*F)(uint, uint, uchar, void *), void *);
-#	   void event_hook_mouse(struct graphic *, \
->	        int (*F)(uint, uint, uchar, void *), void *);
-#	        */
+extern void	EVENT_HOOK_CLOSE(struct GRAPHIC *GRAPHIC, int (*F)(void *), \
+void *ARG);
+extern void	event_hook_close(struct graphic *graphic, int (*f)(void *), \
+void *arg);
+extern void	EVENT_HOOK_KEY_DOWN(struct GRAPHIC *GRAPHIC, \
+int (*F)(unsigned int, void *), void *ARG);
+extern void	event_hook_key_down(struct graphic *graphic, \
+int (*f)(unsigned int, void *), void *arg);
+extern void	EVENT_HOOK_KEY_UP(struct GRAPHIC *GRAPHIC, \
+int (*F)(unsigned int, void *), void *ARG);
+extern void	event_hook_key_up(struct graphic *graphic, \
+int (*f)(unsigned int, void *), void *arg);
+extern void	EVENT_HOOK_LOOP(struct GRAPHIC *GRAPHIC, int (*F)(void *), \
+void *ARG);
+extern void	event_hook_loop(struct graphic *graphic, int (*f)(void *), \
+void *arg);
+extern void	EVENT_HOOK_MOUSE(struct GRAPHIC *GRAPHIC, \
+int (*F)(unsigned int, unsigned int, unsigned char, void *), void *ARG);
+extern void	event_hook_mouse(struct graphic *graphic, \
+int (*f)(unsigned int, unsigned int, unsigned char, void *), void *arg);
 /* ************************** [^] EVENT HOOKS [^] *************************** */
+#	else /* !__STDC__ */
+/* *************************** [v] FUNCTIONS [v] **************************** */
+extern int	GRAPHIC_LOOP();
+extern int	graphic_loop();
+extern void	GRAPHIC_SLEEP()
+extern void	graphic_sleep();
+extern long	GRAPHIC_TIME();
+extern long	graphic_time();
+extern void	WINDOW_CLOSE();
+extern void	window_close();
+extern int	WINDOW_OPEN();
+extern int	window_open();
+extern int	WINDOW_TITLE();
+extern int	window_title();
+extern void	*GRAPHIC_INIT();
+extern void	*graphic_init();
+extern void	GRAPHIC_SETUP();
+extern void	graphic_setup();
+/* *************************** [^] FUNCTIONS [^] **************************** */
+/* ************************** [v] EVENT HOOKS [v] *************************** */
+extern void	EVENT_HOOK_CLOSE();
+extern void	event_hook_close();
+extern void	EVENT_HOOK_KEY_DOWN();
+extern void	event_hook_key_down();
+extern void	EVENT_HOOK_KEY_UP();
+extern void	event_hook_key_up();
+extern void	EVENT_HOOK_LOOP();
+extern void	event_hook_loop();
+extern void	EVENT_HOOK_MOUSE();
+extern void	event_hook_mouse();
+/* ************************** [^] EVENT HOOKS [^] *************************** */
+#	endif /* __STDC__ */
 /* *************************** [V] C++ CLASS [V] **************************** */
 #	ifdef __cplusplus /* C++ */
 		} /* C++ */
 /* TODO:
+
+#	include "GRAPHIC.hpp"
+
 class GRAPHIC
 {
 	struct GRAPHIC (GRAPHIC);

@@ -12,7 +12,7 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_H
+#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "../../#STRUCT.h" /*
 #	 struct GRAPHIC;
@@ -39,4 +39,4 @@ int
 */
 #else
 #	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_H */
+#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C */

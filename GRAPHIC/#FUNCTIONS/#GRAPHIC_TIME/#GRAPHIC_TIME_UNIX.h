@@ -12,7 +12,7 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_TIME_H
+#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_TIME_C
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include <time.h> /*
 #	 define CLOCK_REALTIME
@@ -30,4 +30,4 @@ long
 }
 #else
 #	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_TIME_H */
+#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_TIME_C */

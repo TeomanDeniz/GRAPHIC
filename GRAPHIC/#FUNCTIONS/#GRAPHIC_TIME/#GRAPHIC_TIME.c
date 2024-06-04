@@ -1,5 +1,5 @@
 /******************************************************************************\
-# H - GRAPHIC/#FUNCIONS/#GRAPHIC_TIME            #       Maximum Tension       #
+# C - GRAPHIC/#FUNCIONS/#GRAPHIC_TIME            #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -12,27 +12,31 @@
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifndef GRAPHIC_FUNCTIONS__GRAPHIC_TIME_H
-#	define GRAPHIC_FUNCTIONS__GRAPHIC_TIME_H 202405
-#	if (defined(__APPLE__) && !defined(X11))
-#		include "#GRAPHIC_TIME_MACOS.h"
-#	else
-#		ifdef _WIN32
-#			include "#GRAPHIC_TIME_WINDOWS.h"
-#		else /* DOS */
-#			ifdef __DJGPP__
-#				include "#GRAPHIC_TIME_MSDOS.h"
-#			else /* UNIX (PROBABLY) */
-#				if (defined(__linux__) || defined(__gnu_linux__) || \
-					defined(__FreeBSD__) || defined(__NetBSD__) || \
-					defined(__OpenBSD__) || defined(__DragonFly__) || \
-					defined(__sun) || defined(X11))
-#					include "#GRAPHIC_TIME_UNIX.h"
-#				endif /* UNIX */
-#			endif /* DJGPP (DOS) */
-#		endif /* WINDOWS */
-#	endif /* APPLE */
+#define GRAPHIC_FUNCTIONS__GRAPHIC_TIME_C /* SEALER */
+
+#if (defined(__APPLE__) && !defined(X11))
+#	include "#GRAPHIC_TIME_MACOS.h"
+#else
+#	ifdef _WIN32
+#		include "#GRAPHIC_TIME_WINDOWS.h"
+#	else /* DOS */
+#		ifdef __DJGPP__
+#			include "#GRAPHIC_TIME_MSDOS.h"
+#		else /* UNIX (PROBABLY) */
+#			if (defined(__linux__) || defined(__gnu_linux__) || \
+				defined(__FreeBSD__) || defined(__NetBSD__) || \
+				defined(__OpenBSD__) || defined(__DragonFly__) || \
+				defined(__sun) || defined(X11))
+#				include "#GRAPHIC_TIME_UNIX.h"
+#			endif /* UNIX */
+#		endif /* DJGPP (DOS) */
+#	endif /* WINDOWS */
+#endif /* APPLE */
+
 /* ***************************** [V] LOWERCASE [V] ************************** */
-#	define graphic_time GRAPHIC_TIME
+long
+	graphic_time(void)
+{
+	return (GRAPHIC_TIME());
+}
 /* ***************************** [^] LOWERCASE [^] ************************** */
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_TIME_H */
