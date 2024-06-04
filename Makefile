@@ -13,19 +13,19 @@
 #******************************************************************************#
 
 # *************************** [v] MAIN SOURCES [v] *************************** #
-MAIN_SRC	=	./\#EVENT_HOOKS/\#EVENT_HOOK_CLOSE.c \
-				./\#EVENT_HOOKS/\#EVENT_HOOK_KEY_DOWN.c \
-				./\#EVENT_HOOKS/\#EVENT_HOOK_KEY_UP.c \
-				./\#EVENT_HOOKS/\#EVENT_HOOK_LOOP.c \
-				./\#EVENT_HOOKS/\#EVENT_HOOK_MOUSE.c \
-				./\#FUNCTIONS/\#GRAPHIC_INIT.c \
-				./\#FUNCTIONS/\#GRAPHIC_SETUP.c \
-				./\#FUNCTIONS/\#GRAPHIC_LOOP/\#GRAPHIC_LOOP.c \
-				./\#FUNCTIONS/\#GRAPHIC_SLEEP/\#GRAPHIC_SLEEP.c \
-				./\#FUNCTIONS/\#GRAPHIC_TIME/\#GRAPHIC_TIME.c \
-				./\#FUNCTIONS/\#WINDOW_CLOSE/\#WINDOW_CLOSE.c \
-				./\#FUNCTIONS/\#WINDOW_OPEN/\#WINDOW_OPEN.c \
-				./\#FUNCTIONS/\#WINDOW_TITLE/\#WINDOW_TITLE.c
+MAIN_SRC	=	./GRAPHIC/\#EVENT_HOOKS/\#EVENT_HOOK_CLOSE.c \
+				./GRAPHIC/\#EVENT_HOOKS/\#EVENT_HOOK_KEY_DOWN.c \
+				./GRAPHIC/\#EVENT_HOOKS/\#EVENT_HOOK_KEY_UP.c \
+				./GRAPHIC/\#EVENT_HOOKS/\#EVENT_HOOK_LOOP.c \
+				./GRAPHIC/\#EVENT_HOOKS/\#EVENT_HOOK_MOUSE.c \
+				./GRAPHIC/\#FUNCTIONS/\#GRAPHIC_INIT.c \
+				./GRAPHIC/\#FUNCTIONS/\#GRAPHIC_SETUP.c \
+				./GRAPHIC/\#FUNCTIONS/\#GRAPHIC_LOOP/\#GRAPHIC_LOOP.c \
+				./GRAPHIC/\#FUNCTIONS/\#GRAPHIC_SLEEP/\#GRAPHIC_SLEEP.c \
+				./GRAPHIC/\#FUNCTIONS/\#GRAPHIC_TIME/\#GRAPHIC_TIME.c \
+				./GRAPHIC/\#FUNCTIONS/\#WINDOW_CLOSE/\#WINDOW_CLOSE.c \
+				./GRAPHIC/\#FUNCTIONS/\#WINDOW_OPEN/\#WINDOW_OPEN.c \
+				./GRAPHIC/\#FUNCTIONS/\#WINDOW_TITLE/\#WINDOW_TITLE.c
 # *************************** [^] MAIN SOURCES [^] *************************** #
 
 # **************************** [v] VARIABLES [v] ***************************** #
@@ -48,7 +48,7 @@ MAIN_SRC	=	./\#EVENT_HOOKS/\#EVENT_HOOK_CLOSE.c \
 	# [.c STRINGS TO .o]
 	# ANIMATION VARIABLES
 		TERMINAL_LEN	:=	\
-			$(eval TERMINAL_LEN := )$(TERMINAL_LEN)
+			$(eval TERMINAL_LEN := $(shell tput cols))$(TERMINAL_LEN)
 		NUMBER_OF_FILES	:=	0
 		FILE_COUNTER	:=	0
 		N_OBJ			:=	$(eval N_OBJ := $$(shell find "." \
