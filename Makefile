@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2022/10/24 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/06/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2024/06/08 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 #******************************************************************************#
 
@@ -29,6 +29,8 @@ MAIN_SRC	=	./GRAPHIC/\#EVENT_HOOKS/\#EVENT_HOOK_CLOSE.c \
 # *************************** [^] MAIN SOURCES [^] *************************** #
 
 # **************************** [v] VARIABLES [v] ***************************** #
+MACOS_OPENGL_SUPPORTED := \
+	$(shell test -d "/System/Library/Frameworks/OpenGL.framework" && echo yes)
 	# [COMPILER]
 		CC			=	gcc
 	# [COMPILER]
@@ -36,11 +38,18 @@ MAIN_SRC	=	./GRAPHIC/\#EVENT_HOOKS/\#EVENT_HOOK_CLOSE.c \
 		NAME		=	graphic.a
 	# [PRODUCT]
 	# [COMPILER FLAGS]
-		CFLAGS		=	-Wall -Wextra -Werror -O3
+		CFLAGS		=	-O3 -Wall -Wextra -Werror
+		CFLAGS		+= -Wno-unused-command-line-argument
 		ifeq ($(shell uname -s),Darwin)
-			CFLAGS = -framework Cocoa -framework AudioToolbox # Core Graphics
+			CFLAGS += -framework Cocoa # CORE GRPAHICS
+			CFLAGS += -framework AudioToolbox # AUDIO HANDLE
+			ifeq ($(MACOS_OPENGL_SUPPORTED), yes)
+				CFLAGS += -DGL_SILENCE_DEPRECATION # IGNORE OS WARNINGS
+				# MACOS IS GIVING WARNINGS IF YOU HAVE OPENGL ABOVE MAC - 10.14
+				CFLAGS += -D__APPLE_OPENGL__ # OPENGL
+			endif
 		else
-			CFLAGS = -lX11 -lasound # X11
+			CFLAGS += -lX11 -lasound # X11
 		endif
 	# [COMPILER FLAGS]
 	# [.c STRINGS TO .o]

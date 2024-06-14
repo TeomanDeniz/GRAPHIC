@@ -3,11 +3,13 @@
 
 #include <stdio.h>
 
-// Windows: gcc test.c -lwinmm -lgdi32
+// Windows: gcc graphic.a test.c -lwinmm -lgdi32
 
-// MACOS: gcc test.c -framework Cocoa -framework AudioToolbox
+// MACOS: gcc graphic.a test.c -framework Cocoa -framework AudioToolbox
 
-// Unix: gcc test.c -lX11 -lasound
+// MACOS_OPENGL: gcc graphic.a test.c -framework Cocoa -framework AudioToolbox -framework OpenGL
+
+// Unix: gcc graphic.a test.c -lX11 -lasound
 
 int
 	test(void *arg)

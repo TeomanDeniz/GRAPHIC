@@ -22,7 +22,11 @@
 #define GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C /* SEALER */
 
 #if (defined(__APPLE__) && !defined(X11))
-#	include "#GRAPHIC_LOOP_MACOS.h"
+#	ifdef __APPLE_OPENGL__
+#		include "#GRAPHIC_LOOP_MACOS_OPENGL.h"
+#	else /* CORE GRAPHICS */
+#		include "#GRAPHIC_LOOP_MACOS.h"
+#	endif /* __APPLE_OPENGL__ */
 #else
 #	ifdef _WIN32
 #		include "#GRAPHIC_LOOP_WINDOWS.h"

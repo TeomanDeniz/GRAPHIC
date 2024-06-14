@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/04/26 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2024/06/08 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -19,13 +19,22 @@
 #		include <objc/NSObjCRuntime.h> /*
 #		typedef id;
 #		        */
-#		include <pthread.h> /*
-#		typedef pthread_mutex_t;
-#		typedef pthread_t;
-#		        */
 #		include <CoreGraphics/CoreGraphics.h> /*
 #		typedef CGRect;
 #		        */
+#		ifdef __APPLE_OPENGL__
+#			include <OpenGL/gl3.h> /*
+#			typedef GLuint;
+#			        */
+#			include <OpenGL/OpenGL.h> /*
+#			typedef CGLContextObj;
+#			        */
+#		else /* CORE GRAPHICS */
+#			include <pthread.h> /*
+#			typedef pthread_mutex_t;
+#			typedef pthread_t;
+#			        */
+#		endif /* __APPLE_OPENGL__ */
 #	else
 #		ifdef _WIN32
 #			include <windows.h> /*
@@ -315,22 +324,12 @@ struct s_mouse
 /* ************************* [v] struct GRAPHIC [v] ************************* */
 struct GRAPHIC
 {
-/*
-	......<WINDOW VARIABLES>.......
-	:*/ char          *(TITLE); /*: WINDOW TITLE
-	:*/ int            (WIDTH); /*: WINDOW X SIZE
-	:*/ int           (HEIGHT); /*: WINDOW Y SIZE
-	:*/ unsigned int *(BUFFER); /*: PIXEL MAP OF THE WINDOW
-	:.............................:
-
-	.......<KEYBOARD INPUT>........
-	:*/ struct S_KEY     (KEY); /*: KEY INPUT
-	:.............................:
-
-	.........<MOUSE INPUT>.........
-	:*/ struct S_MOUSE (MOUSE); /*: MOUSE INPUT
-	:.............................:
-*/
+	char                                       *(TITLE);
+	int                                         (WIDTH);
+	int                                        (HEIGHT);
+	unsigned int                              *(BUFFER);
+	struct S_KEY                                  (KEY);
+	struct S_MOUSE                              (MOUSE);
 	int      (*FUNCTION_KEY_DOWN)(unsigned int, void *);
 	void                       *(FUNCTION_KEY_DOWN_ARG);
 	int        (*FUNCTION_KEY_UP)(unsigned int, void *);
@@ -343,17 +342,24 @@ struct GRAPHIC
 	(unsigned int, unsigned int, unsigned char, void *);
 	void                          *(FUNCTION_MOUSE_ARG);
 	unsigned int                       (FPS_START_TIME);
-#	if defined(__APPLE__)
+#	ifdef __APPLE__
 	id                                  (WINDOW_MODULE);
-	pthread_mutex_t                (CLOSE_THREAD_MUTEX);
 	id                                          (EVENT);
 	void                                    *(TIMER_ID);
 	void                                 *(OBSERVER_ID);
-	pthread_t                    (THREAD_UPDATE_WINDOW);
 	CGRect                                (CANVAS_INFO);
+#		ifdef __APPLE_OPENGL__
+	GLuint                                    (PROGRAM);
+	GLuint                       (VERTEX_BUFFER_OBJECT);
+	GLuint                                    (TEXTURE);
+	CGLContextObj                             (CONTEXT);
+#		else /* CORE GRAPHICS */
+	pthread_mutex_t                (CLOSE_THREAD_MUTEX);
+	pthread_t                    (THREAD_UPDATE_WINDOW);
 	CGColorSpaceRef                       (COLOR_SPACE);
 	CGDataProviderRef                  (IMAGE_PROVIDER);
 	char                                 (CLOSE_THREAD); // BOOL
+#		endif /* __APPLE_OPENGL__ */
 #	else
 #		ifdef _WIN32
 	HWND                                (WINDOW_HANDLE);
@@ -369,22 +375,12 @@ struct GRAPHIC
 /* ************************* [v] struct graphic [v] ************************* */
 struct graphic
 {
-/*
-	......<WINDOW VARIABLES>.......
-	:*/ char          *(title); /*: WINDOW TITLE
-	:*/ int            (width); /*: WINDOW X SIZE
-	:*/ int           (height); /*: WINDOW Y SIZE
-	:*/ unsigned int *(buffer); /*: PIXEL MAP OF THE WINDOW
-	:.............................:
-
-	.......<KEYBOARD INPUT>........
-	:*/ struct s_key     (key); /*: KEY INPUT
-	:.............................:
-
-	.........<MOUSE INPUT>.........
-	:*/ struct s_mouse (mouse); /*: MOUSE INPUT
-	:.............................:
-*/
+	char                                       *(title);
+	int                                         (width);
+	int                                        (height);
+	unsigned int                              *(buffer);
+	struct s_key                                  (key);
+	struct s_mouse                              (mouse);
 	int      (*FUNCTION_KEY_DOWN)(unsigned int, void *);
 	void                       *(FUNCTION_KEY_DOWN_ARG);
 	int        (*FUNCTION_KEY_UP)(unsigned int, void *);
@@ -397,17 +393,24 @@ struct graphic
 	(unsigned int, unsigned int, unsigned char, void *);
 	void                          *(FUNCTION_MOUSE_ARG);
 	unsigned int                       (FPS_START_TIME);
-#	if defined(__APPLE__)
+#	ifdef __APPLE__
 	id                                  (WINDOW_MODULE);
-	pthread_mutex_t                (CLOSE_THREAD_MUTEX);
 	id                                          (EVENT);
 	void                                    *(TIMER_ID);
 	void                                 *(OBSERVER_ID);
-	pthread_t                    (THREAD_UPDATE_WINDOW);
 	CGRect                                (CANVAS_INFO);
+#		ifdef __APPLE_OPENGL__
+	GLuint                                    (PROGRAM);
+	GLuint                       (VERTEX_BUFFER_OBJECT);
+	GLuint                                    (TEXTURE);
+	CGLContextObj                             (CONTEXT);
+#		else /* CORE GRAPHICS */
+	pthread_mutex_t                (CLOSE_THREAD_MUTEX);
+	pthread_t                    (THREAD_UPDATE_WINDOW);
 	CGColorSpaceRef                       (COLOR_SPACE);
 	CGDataProviderRef                  (IMAGE_PROVIDER);
 	char                                 (CLOSE_THREAD); // BOOL
+#		endif /* __APPLE_OPENGL__ */
 #	else
 #		ifdef _WIN32
 	HWND                                (WINDOW_HANDLE);
