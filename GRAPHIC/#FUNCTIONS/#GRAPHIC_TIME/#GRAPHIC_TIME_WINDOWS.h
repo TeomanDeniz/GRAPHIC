@@ -14,12 +14,12 @@
 
 #ifdef GRAPHIC_FUNCTIONS__GRAPHIC_TIME_C
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include <winnt.h> /*
-#	typedef LARGE_INTEGER;
-#	        */
 #	include <windows.h> /*
 #	   BOOL QueryPerformanceFrequency(LARGE_INTEGER *);
 #	   BOOL QueryPerformanceCounter(LARGE_INTEGER *);
+#	        */
+#	include <winnt.h> /*
+#	typedef LARGE_INTEGER;
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 long

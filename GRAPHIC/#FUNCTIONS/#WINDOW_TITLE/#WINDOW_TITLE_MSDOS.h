@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/06/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/12 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -17,9 +17,12 @@
 #	include "../../#STRUCT.h" /*
 #	 struct GRAPHIC;
 #	        */
-#	include "../../CMT/KEYWORDS/UNUSED.h" /*
+#	include "../../LIBCMT/KEYWORDS/UNUSED.h" /*
 #	 define UNUSED
 #	 define NOPE
+#	        */
+#	include "../../LIBCMT/KEYWORDS/IGNORE.h" /*
+#	 define IGNORE
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 #	ifdef __STDC__ /* STANDARD C */
@@ -33,8 +36,8 @@ UNUSED int
 	char             *(TITLE);
 #	endif /* __STDC__ */
 {
-	NOPE GRAPHIC;
-	NOPE TITLE;
+	IGNORE GRAPHIC;
+	IGNORE TITLE;
 
 	return (0);
 }
