@@ -101,9 +101,11 @@ v	>>>>>>> (CGLError)
 #	^^^^^^^ CGLSetCurrentContext(CGLContextObj);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 /* ************************ [v] GLOBAL VARIABLES [v] ************************ */
 extern id const NSApp;
 /* ************************ [^] GLOBAL VARIABLES [^] ************************ */
+
 /* ************************* [v] HELPER MACROS [v] ************************** */
 #	ifndef MSG
 #		define MSG(\
@@ -211,24 +213,31 @@ extern id const NSApp;
 		 1.0F, -1.0F,  1.0F, 0.0F, \
 		 1.0F,  1.0F,  1.0F, 1.0F}
 /* ************************* [^] HELPER MACROS [^] ************************** */
+
 /* *************************** [v] PROTOTYPES [v] *************************** */
 extern INLINE BOOL	WINDOW_SHOULD_CLOSE(const id VIEW, const SEL SELECTOR, \
 const id WINDOW);
 /* *************************** [^] PROTOTYPES [^] *************************** */
 
 int
-	WINDOW_OPEN(struct GRAPHIC *GRAPHIC, register unsigned int WIDTH, \
-register unsigned int HEIGHT)
+	WINDOW_OPEN(
+	struct GRAPHIC *GRAPHIC,
+	register unsigned int WIDTH,
+	register unsigned int HEIGHT
+)
 {
-	Class                         (VOYAGER);
-	id                              (TITLE);
-	CGLPixelFormatObj        (PIXEL_FORMAT);
-	GLint                          (NUMBER);
-	CGLPixelFormatAttribute (GL_ATTRIBUTES)[4];
-	register GLuint       (FRAGMENT_SHADER);
-	register GLuint         (VERTEX_SHADER);
+	Class					VOYAGER;
+	id						TITLE;
+	CGLPixelFormatObj		PIXEL_FORMAT;
+	GLint					NUMBER;
+	CGLPixelFormatAttribute	GL_ATTRIBUTES[4];
+	register GLuint			FRAGMENT_SHADER;
+	register GLuint			VERTEX_SHADER;
 
-	IGNORE NUMBER;
+	IGNORE	NUMBER;
+
+	if (!GRAPHIC || !GRAPHIC->TITLE)
+		return (-1);
 
 	GL_ATTRIBUTES[0] = (CGLPixelFormatAttribute)kCGLPFAAllRenderers;
 	GL_ATTRIBUTES[1] = (CGLPixelFormatAttribute)kCGLPFAOpenGLProfile;
@@ -236,22 +245,30 @@ register unsigned int HEIGHT)
 	GL_ATTRIBUTES[3] = (CGLPixelFormatAttribute)0;
 
 	if (CGLChoosePixelFormat(GL_ATTRIBUTES, &PIXEL_FORMAT, &NUMBER))
-		return (-1);
+		return (-2);
 
 	if (CGLCreateContext(PIXEL_FORMAT, ((void *)0), &GRAPHIC->CONTEXT))
 	{
 		CGLDestroyPixelFormat(PIXEL_FORMAT);
-		return (-1);
+		return (-3);
 	}
 
 	VERTEX_SHADER = glCreateShader(GL_VERTEX_SHADER);
 	CGLDestroyPixelFormat(PIXEL_FORMAT);
-	glShaderSource(VERTEX_SHADER, 1, \
-		(const GLchar *const *)&VERTEX_SHADER_SOURCE, ((GLint *)0));
+	glShaderSource(
+		VERTEX_SHADER,
+		1,
+		(const GLchar *const *)&VERTEX_SHADER_SOURCE,
+		((GLint *)0)
+	);
 	glCompileShader(VERTEX_SHADER);
 	FRAGMENT_SHADER = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(FRAGMENT_SHADER, 1, \
-		(const GLchar *const *)&FRAGMENT_SHADER_SOURCE, ((GLint *)0));
+	glShaderSource(
+		FRAGMENT_SHADER,
+		1,
+		(const GLchar *const *)&FRAGMENT_SHADER_SOURCE,
+		((GLint *)0)
+	);
 	glCompileShader(FRAGMENT_SHADER);
 	CGLSetCurrentContext(GRAPHIC->CONTEXT);
 	GRAPHIC->PROGRAM = glCreateProgram();
@@ -267,7 +284,7 @@ register unsigned int HEIGHT)
 		if (GL_ERROR != GL_NO_ERROR)
 			return (GL_ERROR);
 		else
-			return (-1);
+			return (-4);
 	}
 
 	glAttachShader(GRAPHIC->PROGRAM, VERTEX_SHADER);
@@ -280,12 +297,16 @@ register unsigned int HEIGHT)
 	if (GRAPHIC->VERTEX_BUFFER_OBJECT == 0)
 	{
 		glDeleteProgram(GRAPHIC->PROGRAM);
-		return (-1);
+		return (-5);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, GRAPHIC->VERTEX_BUFFER_OBJECT);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VERTEX_BUFFER), VERTEX_BUFFER, \
-		GL_STATIC_DRAW);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		sizeof(VERTEX_BUFFER),
+		VERTEX_BUFFER,
+		GL_STATIC_DRAW
+	);
 	glGenTextures(1, &GRAPHIC->TEXTURE);
 
 	if (GRAPHIC->TEXTURE == 0)
@@ -293,25 +314,25 @@ register unsigned int HEIGHT)
 		glDeleteBuffers(1, &GRAPHIC->VERTEX_BUFFER_OBJECT);
 		GRAPHIC->VERTEX_BUFFER_OBJECT = 0;
 		glDeleteProgram(GRAPHIC->PROGRAM);
-		return (-1);
+		return (-6);
 	}
 
 	glBindTexture(GL_TEXTURE_2D, GRAPHIC->TEXTURE);
-	glTexImage2D(\
-		GL_TEXTURE_2D, \
-		0, \
-		GL_RGBA, \
-		GRAPHIC->WIDTH, \
-		GRAPHIC->HEIGHT, \
-		0, \
-		GL_RGBA, \
-		GL_UNSIGNED_BYTE, \
-		((void *)0)\
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGBA,
+		GRAPHIC->WIDTH,
+		GRAPHIC->HEIGHT,
+		0,
+		GL_RGBA,
+		GL_UNSIGNED_BYTE,
+		((void *)0)
 	);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	GRAPHIC->BUFFER = (unsigned int *)malloc(\
-		sizeof(unsigned int) * ((WIDTH * HEIGHT) + 1));
+	GRAPHIC->BUFFER = (unsigned int *)
+		malloc(sizeof(unsigned int) * ((WIDTH * HEIGHT) + 1));
 
 	if (!GRAPHIC->BUFFER)
 	{
@@ -320,7 +341,7 @@ register unsigned int HEIGHT)
 		glDeleteBuffers(1, &GRAPHIC->VERTEX_BUFFER_OBJECT);
 		GRAPHIC->VERTEX_BUFFER_OBJECT = 0;
 		glDeleteProgram(GRAPHIC->PROGRAM);
-		return (-1);
+		return (-7);
 	}
 
 	PREFETCH_RANGE(GRAPHIC->BUFFER, WIDTH * HEIGHT);
@@ -328,27 +349,27 @@ register unsigned int HEIGHT)
 	GRAPHIC->HEIGHT = HEIGHT;
 	MSG(id, REFRESH_SCREEN("NSApplication"), "sharedApplication");
 	MSG1(void, NSApp, "setActivationPolicy:", NSInteger, 0);
-	GRAPHIC->WINDOW_MODULE = MSG4(\
-		id, \
-		MSG(\
-			id, \
-			REFRESH_SCREEN("NSWindow"), \
-			"alloc"\
-		), \
-		"initWithContentRect:styleMask:backing:defer:", \
-		CGRect, \
-		CGRectMake(\
-			0, \
-			0, \
-			GRAPHIC->WIDTH, \
-			GRAPHIC->HEIGHT\
-		), \
-		NSUInteger, \
-		3, \
-		NSUInteger, \
-		2, \
-		BOOL, \
-		NO\
+	GRAPHIC->WINDOW_MODULE = MSG4(
+		id,
+		MSG(
+			id,
+			REFRESH_SCREEN("NSWindow"),
+			"alloc"
+		),
+		"initWithContentRect:styleMask:backing:defer:",
+		CGRect,
+		CGRectMake(
+			0,
+			0,
+			GRAPHIC->WIDTH,
+			GRAPHIC->HEIGHT
+		),
+		NSUInteger,
+		3,
+		NSUInteger,
+		2,
+		BOOL,
+		NO
 	);
 
 	if (!GRAPHIC->WINDOW_MODULE)
@@ -360,53 +381,58 @@ register unsigned int HEIGHT)
 		glDeleteProgram(GRAPHIC->PROGRAM);
 		free(GRAPHIC->BUFFER);
 		GRAPHIC->BUFFER = ((void *)0);
-		return (-1);
+		return (-8);
 	}
 
-	VOYAGER = objc_allocateClassPair(\
-		(Class)REFRESH_SCREEN("NSObject"), \
-		"WindowDelegate", \
-		0\
+	VOYAGER = objc_allocateClassPair(
+		(Class)REFRESH_SCREEN("NSObject"),
+		"WindowDelegate",
+		0
 	);
 
 	if (!VOYAGER)
 	{
 		WINDOW_CLOSE(GRAPHIC);
-		return (-1);
+		return (-9);
 	}
 
-	class_addMethod(\
-		VOYAGER, \
-		sel_getUid("windowShouldClose:"), \
-		(IMP)WINDOW_SHOULD_CLOSE, \
-		"c@:@"\
+	class_addMethod(
+		VOYAGER,
+		sel_getUid("windowShouldClose:"),
+		(IMP)WINDOW_SHOULD_CLOSE,
+		"c@:@"
 	);
 	objc_registerClassPair(VOYAGER);
-	MSG1(\
-		void, \
-		GRAPHIC->WINDOW_MODULE, \
-		"setDelegate:", \
-		id, \
-		MSG(\
-			id, \
-			MSG(\
-				id, \
-				(id)VOYAGER, \
-				"alloc"\
-			), \
-			"init"\
-		)\
+	MSG1(
+		void,
+		GRAPHIC->WINDOW_MODULE,
+		"setDelegate:",
+		id,
+		MSG(
+			id,
+			MSG(
+				id,
+				(id)VOYAGER,
+				"alloc"
+			),
+			"init"
+		)
 	);
-	TITLE = MSG1(\
-		id, \
-		REFRESH_SCREEN("NSString"), \
-		"stringWithUTF8String:", \
-		const char *, \
-		GRAPHIC->TITLE\
+	TITLE = MSG1(
+		id,
+		REFRESH_SCREEN("NSString"),
+		"stringWithUTF8String:",
+		const char *,
+		GRAPHIC->TITLE
 	);
 	MSG1(void, GRAPHIC->WINDOW_MODULE, "setTitle:", id, TITLE);
-	MSG1(void, GRAPHIC->WINDOW_MODULE, "makeKeyAndOrderFront:", id, \
-		((void *)0));
+	MSG1(
+		void,
+		GRAPHIC->WINDOW_MODULE,
+		"makeKeyAndOrderFront:",
+		id,
+		((void *)0)
+	);
 	MSG(void, GRAPHIC->WINDOW_MODULE, "center");
 	MSG1(void, NSApp, "activateIgnoringOtherApps:", BOOL, YES);
 	glFlush();
@@ -416,13 +442,14 @@ register unsigned int HEIGHT)
 extern INLINE BOOL
 	WINDOW_SHOULD_CLOSE(const id VIEW, const SEL SELECTOR, const id WINDOW)
 {
-	IGNORE VIEW;
-	IGNORE SELECTOR;
-	IGNORE WINDOW;
+	IGNORE	VIEW;
+	IGNORE	SELECTOR;
+	IGNORE	WINDOW;
 
 	MSG1(void, NSApp, "terminate:", id, NSApp);
 	return (YES);
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__WINDOW_OPEN_C */

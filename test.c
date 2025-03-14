@@ -1,9 +1,7 @@
 
 #include "GRAPHIC.h"
 
-#include <stdio.h>
-
-// Windows: gcc graphic.a test.c -lwinmm -lgdi32
+// Windows: gcc test.c graphic.a -lwinmm -lgdi32
 
 // MACOS: gcc graphic.a test.c -framework Cocoa -framework AudioToolbox
 
@@ -11,28 +9,27 @@
 
 // Unix: gcc graphic.a test.c -lX11 -lasound
 
+int colorOffset = 0;
+
 int
 	test(void *arg)
 {
 	struct graphic	*graphic;
 
 	graphic = arg;
+	colorOffset = (colorOffset + 5) % 255;
 
-	static int i = 0;
-	static int j = 0;
-	register int x;
-	register int y;
-
-	y = -1;
-	while (++y, y < graphic->height)
+	for (int y = 0; y < graphic->height; y++)
 	{
-		x = -1;
-		while (++x, x < graphic->width)
+		for (int x = 0; x < graphic->width; x++)
 		{
-			put_pixel(graphic, x, y, 0XFF0000 - (i + j));
-			j++;
+			int a = (x * 255) / graphic->width;
+			int r = ((y * 255) / graphic->height) * a / 255;
+			int g = ((colorOffset + x) % 255) * a / 255;
+			int b = ((colorOffset + y) % 255) * a / 255;
+
+			put_pixel(graphic, x, y, (a << 24) | (r << 16) | (g << 8) | b);
 		}
-		++i;
 	}
 
 	if (graphic->key.esc)
@@ -47,7 +44,9 @@ int
 	struct graphic	graphic;
 
 	graphic_setup(&graphic);
-	window_open(&graphic, 1000, 754);
+	graphic.WINDOW_STYLE.TRANSPARENCY = 1;
+	graphic.FPS = 120;
+	window_open(&graphic, 1400, 800);
 	event_hook_loop(&graphic, test, (void *)&graphic);
 	graphic_loop(&graphic);
 	return (0);

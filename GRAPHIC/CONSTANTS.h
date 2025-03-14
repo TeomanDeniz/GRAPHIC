@@ -8,13 +8,13 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/12 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
 #ifndef GRAPHICS_CONSTANTS_H
 /* *********************** [v] KEYBOARD CONSTANTS [v] *********************** */
-#	define GRAPHICS_CONSTANTS_H 202405
+#	define GRAPHICS_CONSTANTS_H 202503
 #	define KEY_BACKSPACE 8
 #	define KEY_TAB 9
 #	define KEY_ENTER 10
@@ -100,6 +100,7 @@
 #	define KEY_RIGHT_BRACKET 221
 #	define KEY_APOSTROPHE 222
 /* *********************** [^] KEYBOARD CONSTANTS [^] *********************** */
+
 /* ********************* [v] MOUSE INPUT CONSTANTS [v] ********************** */
 #	define MOUSE_LEFT_CLICK 1
 #	define MOUSE_RIGHT_CLICK 2

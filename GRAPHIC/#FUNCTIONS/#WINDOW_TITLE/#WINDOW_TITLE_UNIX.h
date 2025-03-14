@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/06/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -22,11 +22,13 @@
 #	    int XSync(Display *, Bool);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 int
-	WINDOW_TITLE(struct GRAPHIC *GRAPHIC, char *TITLE)
+	WINDOW_TITLE(struct GRAPHIC *const GRAPHIC, const char *const TITLE)
 {
-	static char (CURRENT_TITLE)[1024];
-	register int   (TITLE_SIZE);
+	static char	CURRENT_TITLE[1024];
+	// OK I AM LIED. I AM TOO LAZY TO HANDLE MALLOCS.
+	// WHAT? WHAT YOU GONNA DO ABOUT IT? OPEN AN ISSUE?
 
 	if (!GRAPHIC)
 		return (-1);
@@ -38,10 +40,15 @@ int
 	}
 	else
 	{
-		TITLE_SIZE = -1;
+		register int	TITLE_SIZE;
 
-		while (++TITLE_SIZE, TITLE[TITLE_SIZE] && TITLE_SIZE < 1023)
+		TITLE_SIZE = 0;
+
+		while (TITLE[TITLE_SIZE] && TITLE_SIZE < 1023)
+		{
 			CURRENT_TITLE[TITLE_SIZE] = TITLE[TITLE_SIZE];
+			++TITLE_SIZE;
+		}
 
 		CURRENT_TITLE[TITLE_SIZE] = 0;
 	}

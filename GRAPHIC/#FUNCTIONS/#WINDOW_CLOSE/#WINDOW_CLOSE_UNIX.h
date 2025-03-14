@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -20,13 +20,15 @@
 #	include <X11/Xlib.h> /*
 #	    int XFreeGC(Display *, GC);
 #	    int XCloseDisplay(Display *);
+#	    int XDestroyWindow(Display *, Window);
 #	        */
 #	include <stdlib.h> /*
 #	   void free(void *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 void
-	WINDOW_CLOSE(struct GRAPHIC *GRAPHIC)
+	WINDOW_CLOSE(struct GRAPHIC *const GRAPHIC)
 {
 	if (!!GRAPHIC->GRAPHICS_CONTEXT)
 	{
@@ -34,17 +36,10 @@ void
 		GRAPHIC->GRAPHICS_CONTEXT = ((void *)0);
 	}
 
-	if (!!GRAPHIC->WINDOW_HANDLE)
+	if (!!GRAPHIC->WINDOW)
 	{
-		HDC (__HDC__);
-
-		__HDC__ = GetDC(GRAPHIC->WINDOW_HANDLE);
-
-		if (!!__HDC__)
-			ReleaseDC(GRAPHIC->WINDOW_HANDLE, __HDC__);
-
-		DestroyWindow(GRAPHIC->WINDOW_HANDLE);
-		GRAPHIC->WINDOW_HANDLE = ((void *)0);
+		XDestroyWindow(GRAPHIC->DISPLAY, GRAPHIC->WINDOW);
+		GRAPHIC->WINDOW = ((void *)0);
 	}
 
 	if (!!GRAPHIC->DISPLAY)
@@ -65,6 +60,7 @@ void
 		GRAPHIC->BUFFER = ((void *)0);
 	}
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__WINDOW_CLOSE_C */

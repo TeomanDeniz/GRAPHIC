@@ -69,9 +69,11 @@
 #	   void free(void *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 /* *************************** [v] PROTOTYPES [v] *************************** */
-static int	__GRAPHIC_LOOP__(struct GRAPHIC *GRAPHIC);
+static int	__GRAPHIC_LOOP__(struct GRAPHIC *const GRAPHIC);
 /* *************************** [^] PROTOTYPES [^] *************************** */
+
 int
 	GRAPHIC_LOOP(struct GRAPHIC *GRAPHIC)
 {
@@ -81,18 +83,33 @@ int
 			GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
 	}
 	else
-		while (!__GRAPHIC_LOOP__(GRAPHIC));
+	{
+		while (!__GRAPHIC_LOOP__(GRAPHIC))
+			(void)0;
+	}
+
 	return (0);
 }
 
 static int
-	__GRAPHIC_LOOP__(struct GRAPHIC *GRAPHIC)
+	__GRAPHIC_LOOP__(struct GRAPHIC *const GRAPHIC)
 {
-	XEvent (EVENT);
+	XEvent	EVENT;
 
-	XPutImage(GRAPHIC->DISPLAY, GRAPHIC->WINDOW, GRAPHIC->GRAPHICS_CONTEXT, \
-		GRAPHIC->IMAGE, 0, 0, 0, 0, GRAPHIC->WIDTH, GRAPHIC->HEIGHT);
+	XPutImage(
+		GRAPHIC->DISPLAY,
+		GRAPHIC->WINDOW,
+		GRAPHIC->GRAPHICS_CONTEXT,
+		GRAPHIC->IMAGE,
+		0,
+		0,
+		0,
+		0,
+		GRAPHIC->WIDTH,
+		GRAPHIC->HEIGHT
+	);
 	XFlush(GRAPHIC->DISPLAY);
+
 	while (XPending(GRAPHIC->DISPLAY))
 	{
 		GRAPHIC->MOUSE.LEFT_UP = 0;
@@ -102,6 +119,7 @@ static int
 		GRAPHIC->MOUSE.WHEEL = 0;
 		GRAPHIC->MOUSE.HORIZANTAL_WHEEL = 0;
 		XNextEvent(GRAPHIC->DISPLAY, &EVENT);
+
 		if (EVENT.type == ButtonPress)
 		{
 			switch (EVENT.xbutton.button)
@@ -151,12 +169,14 @@ static int
 			}
 
 			if (!!GRAPHIC->FUNCTION_MOUSE)
-				GRAPHIC->FUNCTION_MOUSE(\
-					GRAPHIC->X, \
-					GRAPHIC->Y, \
-					GRAPHIC->MOUSE.VALUE, \
-					GRAPHIC->FUNCTION_MOUSE_ARG\
+			{
+				GRAPHIC->FUNCTION_MOUSE(
+					GRAPHIC->X,
+					GRAPHIC->Y,
+					GRAPHIC->MOUSE.VALUE,
+					GRAPHIC->FUNCTION_MOUSE_ARG
 				);
+			}
 		}
 		else if (EVENT.type == ButtonRelease)
 		{
@@ -177,17 +197,19 @@ static int
 			}
 
 			if (!!GRAPHIC->FUNCTION_MOUSE)
-				GRAPHIC->FUNCTION_MOUSE(\
-					GRAPHIC->X, \
-					GRAPHIC->Y, \
-					GRAPHIC->MOUSE.VALUE, \
-					GRAPHIC->FUNCTION_MOUSE_ARG\
+			{
+				GRAPHIC->FUNCTION_MOUSE(
+					GRAPHIC->X,
+					GRAPHIC->Y,
+					GRAPHIC->MOUSE.VALUE,
+					GRAPHIC->FUNCTION_MOUSE_ARG
 				);
+			}
 		}
 		else if (EVENT.type == ClientMessage)
 		{
-			if (EVENT.xclient.data.l[0] == \
-				XInternAtom(GRAPHIC->DISPLAY, "WM_DELETE_WINDOW", False))
+			if (EVENT.xclient.data.l[0] ==
+				XInternAtom(GRAPHIC->DISPLAY, "WM_DELETE_WINDOW", 0))
 			{
 				if (!GRAPHIC->FUNCTION_CLOSE)
 				{
@@ -207,26 +229,34 @@ static int
 		{
 			GRAPHIC->MOUSE.X = EVENT.xmotion.x;
 			GRAPHIC->MOUSE.Y = EVENT.xmotion.y;
+
 			if (!!GRAPHIC->FUNCTION_MOUSE)
-				GRAPHIC->FUNCTION_MOUSE(\
-					GRAPHIC->X, \
-					GRAPHIC->Y, \
-					GRAPHIC->MOUSE.VALUE, \
-					GRAPHIC->FUNCTION_MOUSE_ARG\
+			{
+				GRAPHIC->FUNCTION_MOUSE(
+					GRAPHIC->X,
+					GRAPHIC->Y,
+					GRAPHIC->MOUSE.VALUE,
+					GRAPHIC->FUNCTION_MOUSE_ARG
 				);
+			}
 		}
 		else if (EVENT.type == KeyPress || EVENT.type == KeyRelease)
 		{
-			register int (KEY_MODE);
-			register int      (KEY);
+			register int	KEY_MODE;
+			register int	KEY;
 
 			KEY_MODE = EVENT.xkey.state;
-			KEY = XkbKeycodeToKeysym(GRAPHIC->DISPLAY, \
-				EVENT.xkey.keycode, 0, 0);
+			KEY = XkbKeycodeToKeysym(
+				GRAPHIC->DISPLAY,
+				EVENT.xkey.keycode,
+				0,
+				0
+			);
 			GRAPHIC->KEY.CTRL = !!(KEY_MODE & ControlMask);
 			GRAPHIC->KEY.SHIFT = !!(KEY_MODE & ShiftMask);
 			GRAPHIC->KEY.ALT = !!(KEY_MODE & Mod1Mask);
 			GRAPHIC->KEY.COMMAND = !!(KEY_MODE & Mod4Mask);
+
 			switch (KEY) // "switch case" is speed! Wrom wrommmm!!!
 			{ // https://www.cl.cam.ac.uk/~mgk25/ucs/keysymdef.h
 				case XK_BackSpace:
@@ -677,26 +707,42 @@ static int
 					else
 						GRAPHIC->KEY.UP = 57;
 					break ;
-				case XK_section:
+				case (XK_section):
+				{
 					GRAPHIC->KEY.SELECTION_SIGN = (EVENT.type == KeyPress);
+
 					if (EVENT_TYPE == 10)
 						GRAPHIC->KEY.DOWN = 245;
 					else
 						GRAPHIC->KEY.UP = 245;
+
 					break ;
+				}
 			}
+
 			if (EVENT.type == KeyPress)
+			{
 				if (!!GRAPHIC->FUNCTION_KEY_DOWN)
-					GRAPHIC->FUNCTION_KEY_DOWN(GRAPHIC->KEY.DOWN, \
-						GRAPHIC->FUNCTION_KEY_DOWN_ARG);
+				{
+					GRAPHIC->FUNCTION_KEY_DOWN(
+						GRAPHIC->KEY.DOWN,
+						GRAPHIC->FUNCTION_KEY_DOWN_ARG
+					);
+				}
+			}
 			else if (!!GRAPHIC->FUNCTION_KEY_UP)
-				GRAPHIC->FUNCTION_KEY_UP(GRAPHIC->KEY.UP, \
-					GRAPHIC->FUNCTION_KEY_UP_ARG);
+			{
+				GRAPHIC->FUNCTION_KEY_UP(
+					GRAPHIC->KEY.UP,
+					GRAPHIC->FUNCTION_KEY_UP_ARG
+				);
+			}
 		}
 	}
 
 	return (0);
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C */

@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/06/09 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -45,8 +45,14 @@
 #endif /* APPLE */
 
 /* ***************************** [V] LOWERCASE [V] ************************** */
+#	ifdef __STDC__ /* STANDARD C */
 void
-	window_close(struct graphic *graphic)
+	window_close(struct graphic *const graphic)
+#	else /* K&R */
+void
+	window_close(graphic)
+	struct graphic	*graphic;
+#	endif /* __STDC__ */
 {
 	WINDOW_CLOSE((struct GRAPHIC *)graphic);
 }

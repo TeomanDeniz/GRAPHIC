@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -16,6 +16,9 @@
 #include "../../#STRUCT.h" /*
 # struct graphic;
 # struct GRAPHIC;
+#        */
+#include "../../LIBCMT/KEYWORDS/UNUSED.h" /*
+# define UNUSED
 #        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
@@ -41,8 +44,16 @@
 #endif /* APPLE */
 				
 /* ***************************** [V] LOWERCASE [V] ************************** */
-int
-	window_title(struct graphic *graphic, char *title)
+#	ifdef __STDC__ /* STANDARD C */
+UNUSED int
+	window_title(struct graphic *const graphic, char *const title)
+#	else /* K&R */
+UNUSED int
+	window_title(graphic, title)
+
+	struct graphic	*graphic;
+	char			*title;
+#	endif /* __STDC__ */
 {
 	return (WINDOW_TITLE((struct GRAPHIC *)graphic, title));
 }

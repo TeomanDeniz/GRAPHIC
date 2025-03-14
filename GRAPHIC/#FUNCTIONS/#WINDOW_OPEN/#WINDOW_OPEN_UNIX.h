@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/03/12 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -19,6 +19,7 @@
 #	   void WINDOW_CLOSE(struct GRAPHIC *);
 #	        */
 #	include <stdlib.h> /*
+#	typedef size_t;
 #	   void *malloc(size_t);
 #	        */
 #	include "../../LIBCMT/FUNCTIONS/PREFETCH.h" /*
@@ -30,110 +31,277 @@
 #	 define BlackPixel(dpy, scr)
 #	 define WhitePixel(dpy, scr)
 #	 define DefaultVisual(dpy, scr)
+#	 define CWBackPixel
+#	 define CWBorderPixel
+#	 define CWOverrideRedirect
+#	 define StructureNotifyMask
+#	 define CopyFromParent
+#	 define InputOutput
+#	 define ZPixmap
+#	 define ExposureMask
+#	 define KeyPressMask
+#	 define KeyReleaseMask
+#	 define ButtonPressMask
+#	 define ButtonReleaseMask
+#	 define PointerMotionMask
+#	 define PMinSize
+#	 define PMaxSize
+#	 define CurrentTime
+#	 define PropModeReplace
+#	 define RevertToParent
+#	typedef XSetWindowAttributes
+#	typedef XSizeHints
 #	Display *XOpenDisplay(char *);
-#	 Window XCreateSimpleWindow(Display *, Window, int, int, uint, uint, uint,
->	        ulong, ulong);
+#	 Window XCreateWindow(Display *, Window, int, int, uint, uint, uint,
+>	        	int, uint, Visual *, ulong, XSetWindowAttributes *);
 #	     GC XCreateGC(Display *, Drawable, ulong, XGCValues *);
 #	    int XSelectInput(Display *, Window, long);
 #	    int XStoreName(Display *, Window, char *);
 #	    int XMapWindow(Display *, Window);
 #	    int XSync(Display *, Bool);
 #	 XImage *XCreateImage(Display *, Visual *, uint, int, int, char *, uint,
->	        uint, int, int);
+>	        	uint, int, int);
+#	   void XSetWMNormalHints(Display *, Window, XSizeHints *);
+#	    int XSetTransientForHint(Display *, Window, Window);
+#	    int XSetInputFocus(Display *, Window, int, Time);
+#	   Atom XInternAtom(Display *, char *, Bool);
+#	    int XChangeProperty(Display *, Window, Atom, Atom, int, int, uchar *,
+>	        	int);
+#	 Status XIconifyWindow(Display *, Window, int);
+#	 Status XSetWMProtocols(Display *, Window, Atom *, int);
+#	        */
+#	include <X11/Xatom.h> /*
+#	 define XA_ATOM
+#	typedef Atom;
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
-int
-	WINDOW_OPEN(struct GRAPHIC *GRAPHIC, register unsigned int WIDTH, \
-register unsigned int HEIGHT)
+
+/* *************************** [v] PROTOTYPES [v] *************************** */
+extern void	*memset(void *, int, size_t);
+/* *************************** [^] PROTOTYPES [^] *************************** */
+
+/* ***************************** [v] UNIONS [v] ***************************** */
+union U_ATOM_TO_UCHAR__CONVERT
 {
-	register int (SCREEN);
+	Atom			*ATOM;
+	unsigned char	*BYTE;
+};
+/* ***************************** [^] UNIONS [^] ***************************** */
 
-	GRAPHIC->BUFFER = (unsigned int *)malloc(\
-		sizeof(unsigned int) * (WIDTH * HEIGHT + 1)\
-	);
+int
+	WINDOW_OPEN(
+	struct GRAPHIC *GRAPHIC,
+	register unsigned int WIDTH,
+	register unsigned int HEIGHT
+)
+{
+	register int			SCREEN;
+	register unsigned long	WINDOW_ATTRIBUTES;
+	XSetWindowAttributes	X_WINDOW_ATTRIBUTES;
+	XSizeHints				SIZE_HINTS;
+	Atom					WM_DELETE;
 
-	if (!GRAPHIC->BUFFER)
+	if (!GRAPHIC || !GRAPHIC->TITLE)
 		return (-1);
 
+	GRAPHIC->BUFFER = (unsigned int *)
+		malloc(sizeof(unsigned int) * (WIDTH * HEIGHT + 1));
+
+	if (!GRAPHIC->BUFFER)
+		return (-2);
+
 	PREFETCH_RANGE(GRAPHIC->BUFFER, WIDTH * HEIGHT);
+	WINDOW_ATTRIBUTES = (unsigned long)0;
 	GRAPHIC->WIDTH = WIDTH;
 	GRAPHIC->HEIGHT = HEIGHT;
 	GRAPHIC->DISPLAY = XOpenDisplay(NULL);
+	SIZE_HINTS.flags = PMinSize | PMaxSize;
 
-	if (!GRAPHIC->WINDOW)
+	if (!GRAPHIC->DISPLAY)
 	{
 		WINDOW_CLOSE(GRAPHIC);
-		return (-1);
+		return (-3);
 	}
 
+	memset(&X_WINDOW_ATTRIBUTES, 0, sizeof(XSetWindowAttributes));
 	SCREEN = DefaultScreen(GRAPHIC->DISPLAY);
-	GRAPHIC->WINDOW = XCreateSimpleWindow(\
-		GRAPHIC->DISPLAY, \
-		RootWindow(GRAPHIC->DISPLAY, SCREEN), \
-		0, \
-		0, \
-		GRAPHIC->WIDTH, \
-		GRAPHIC->HEIGHT, \
-		0, \
-		BlackPixel(GRAPHIC->DISPLAY, SCREEN), \
-		WhitePixel(GRAPHIC->DISPLAY, SCREEN)\
+	X_WINDOW_ATTRIBUTES.event_mask |= StructureNotifyMask;
+
+	if (GRAPHIC->WINDOW_STYLE.TRANSPARENCY)
+	{
+		WINDOW_ATTRIBUTES |= CWBackPixel;
+		X_WINDOW_ATTRIBUTES.background_pixel = 0;
+	}
+	else
+	{
+		X_WINDOW_ATTRIBUTES.background_pixel =
+			WhitePixel(GRAPHIC->DISPLAY, SCREEN);
+	}
+
+	if (!GRAPHIC->WINDOW_STYLE.BORDER)
+	{
+		WINDOW_ATTRIBUTES |= CWBorderPixel;
+		X_WINDOW_ATTRIBUTES.border_pixel = 0;
+	}
+	else
+		X_WINDOW_ATTRIBUTES.border_pixel = BlackPixel(GRAPHIC->DISPLAY, SCREEN);
+
+	if (!GRAPHIC->WINDOW_STYLE.RESIZABLE)
+	{
+		SIZE_HINTS.min_width = GRAPHIC->WIDTH;
+		SIZE_HINTS.max_width = GRAPHIC->WIDTH;
+		SIZE_HINTS.min_height = GRAPHIC->HEIGHT;
+		SIZE_HINTS.max_height = GRAPHIC->HEIGHT;
+	}
+
+	if (GRAPHIC->WINDOW_STYLE.TOPMOST)
+	{
+		WINDOW_ATTRIBUTES |= CWOverrideRedirect;
+		X_WINDOW_ATTRIBUTES.override_redirect = 1;
+	}
+
+	XSetWMNormalHints(GRAPHIC->DISPLAY, GRAPHIC->WINDOW, &SIZE_HINTS);
+	GRAPHIC->WINDOW = XCreateWindow(
+		GRAPHIC->DISPLAY,
+		RootWindow(GRAPHIC->DISPLAY, SCREEN),
+		0,
+		0,
+		GRAPHIC->WIDTH,
+		GRAPHIC->HEIGHT,
+		0,
+		CopyFromParent,
+		InputOutput,
+		CopyFromParent,
+		WINDOW_ATTRIBUTES,
+		&X_WINDOW_ATTRIBUTES
 	);
 
 	if (!GRAPHIC->WINDOW)
 	{
 		WINDOW_CLOSE(GRAPHIC);
-		return (-1);
+		return (-4);
 	}
 
-	GRAPHIC->GRAPHICS_CONTEXT = XCreateGC(\
-		GRAPHIC->DISPLAY, \
-		GRAPHIC->WINDOW, \
-		0, \
-		0\
+	GRAPHIC->GRAPHICS_CONTEXT = XCreateGC(
+		GRAPHIC->DISPLAY,
+		GRAPHIC->WINDOW,
+		0,
+		0
 	);
 
 	if (!GRAPHIC->GRAPHICS_CONTEXT)
 	{
 		WINDOW_CLOSE(GRAPHIC);
-		return (-1);		
+		return (-5);		
 	}
 
-	XSelectInput(\
-		GRAPHIC->DISPLAY, \
-		GRAPHIC->WINDOW, \
-		(\
-			ExposureMask | \
-			KeyPressMask | \
-			KeyReleaseMask | \
-			ButtonPressMask | \
-			ButtonReleaseMask | \
+	XSelectInput(
+		GRAPHIC->DISPLAY,
+		GRAPHIC->WINDOW,
+		(
+			ExposureMask |
+			KeyPressMask |
+			KeyReleaseMask |
+			ButtonPressMask |
+			ButtonReleaseMask |
 			PointerMotionMask
-		)\
+		)
 	);
 	XStoreName(GRAPHIC->DISPLAY, GRAPHIC->WINDOW, GRAPHIC->TITLE);
-	XMapWindow(GRAPHIC->DISPLAY, GRAPHIC->WINDOW);
-	XSync(GRAPHIC->DISPLAY, GRAPHIC->WINDOW);
-	GRAPHIC->IMAGE = XCreateImage(\
-		GRAPHIC->DISPLAY, \
-		DefaultVisual(GRAPHIC->DISPLAY, 0), \
-		24, \
-		ZPixmap, \
-		0, \
-		(char *)GRAPHIC->BUFFER, \
-		GRAPHIC->WIDTH, \
-		GRAPHIC->HEIGHT, \
-		32, \
-		0\
+
+	if (GRAPHIC->WINDOW_STYLE.TOOLWINDOW)
+	{
+		XSetTransientForHint(
+			GRAPHIC->DISPLAY,
+			GRAPHIC->WINDOW,
+			RootWindow(GRAPHIC->DISPLAY, SCREEN)
+		);
+	}
+
+	WM_DELETE = XInternAtom(GRAPHIC->DISPLAY, "WM_DELETE_WINDOW", 0);
+	XSetWMProtocols(GRAPHIC->DISPLAY, GRAPHIC->WINDOW, &WM_DELETE, 1);
+
+	if (GRAPHIC->WINDOW_STYLE.MINIMIZABLE)
+		XIconifyWindow(GRAPHIC->DISPLAY, GRAPHIC->WINDOW, SCREEN);
+
+	if (GRAPHIC->WINDOW_STYLE.MAXIMIZABLE)
+	{
+		union U_ATOM_TO_UCHAR__CONVERT	CONVERT;
+		Atom							NET_WM_STATE;
+		Atom							NET_WM_STATE_MAXIMIZED_HORZ;
+		Atom							NET_WM_STATE_MAXIMIZED_VERT;
+
+		NET_WM_STATE = XInternAtom(GRAPHIC->DISPLAY, "_NET_WM_STATE", 0);
+		NET_WM_STATE_MAXIMIZED_HORZ = XInternAtom(
+			GRAPHIC->DISPLAY,
+			"_NET_WM_STATE_MAXIMIZED_HORZ",
+			0
+		);
+		NET_WM_STATE_MAXIMIZED_VERT = XInternAtom(
+			GRAPHIC->DISPLAY,
+			"_NET_WM_STATE_MAXIMIZED_VERT",
+			0
+		);
+		CONVERT.ATOM = &NET_WM_STATE_MAXIMIZED_HORZ;
+		XChangeProperty(
+			GRAPHIC->DISPLAY,
+			GRAPHIC->WINDOW,
+			NET_WM_STATE,
+			XA_ATOM,
+			32,
+			PropModeReplace,
+			CONVERT.BYTE,
+			1
+		);
+		CONVERT.ATOM = &NET_WM_STATE_MAXIMIZED_VERT;
+		XChangeProperty(
+			GRAPHIC->DISPLAY,
+			GRAPHIC->WINDOW,
+			NET_WM_STATE,
+			XA_ATOM,
+			32,
+			PropModeReplace,
+			CONVERT.BYTE,
+			1
+		);
+	}
+
+	if (GRAPHIC->WINDOW_STYLE.FOCUSABLE)
+	{
+		XSetInputFocus(
+			GRAPHIC->DISPLAY,
+			GRAPHIC->WINDOW,
+			RevertToParent,
+			CurrentTime
+		);
+	}
+
+	if (!GRAPHIC->WINDOW_STYLE.HIDEONCREATE)
+		XMapWindow(GRAPHIC->DISPLAY, GRAPHIC->WINDOW);
+
+	XSync(GRAPHIC->DISPLAY, 0);
+	GRAPHIC->IMAGE = XCreateImage(
+		GRAPHIC->DISPLAY,
+		DefaultVisual(GRAPHIC->DISPLAY, 0),
+		24,
+		ZPixmap,
+		0,
+		(char *)GRAPHIC->BUFFER,
+		GRAPHIC->WIDTH,
+		GRAPHIC->HEIGHT,
+		32,
+		0
 	);
 
 	if (!GRAPHIC->IMAGE)
 	{
 		WINDOW_CLOSE(GRAPHIC);
-		return (-1);
+		return (-6);
 	}
 
 	return (0);
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__WINDOW_OPEN_C */

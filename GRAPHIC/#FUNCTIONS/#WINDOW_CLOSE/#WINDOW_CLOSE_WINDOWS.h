@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -24,9 +24,13 @@
 #	   void free(void *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 void
-	WINDOW_CLOSE(struct GRAPHIC *GRAPHIC)
+	WINDOW_CLOSE(struct GRAPHIC *const GRAPHIC)
 {
+	if (!GRAPHIC)
+		return ;
+
 	if (!!GRAPHIC->WINDOW_HANDLE)
 	{
 		DestroyWindow(GRAPHIC->WINDOW_HANDLE);
@@ -39,6 +43,7 @@ void
 		GRAPHIC->BUFFER = ((void *)0);
 	}
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__WINDOW_CLOSE_C */

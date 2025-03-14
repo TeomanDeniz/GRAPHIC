@@ -83,18 +83,20 @@ v	>>>>>>> (CGImageRef)
 #	 define IGNORE
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 /* ************************ [v] GLOBAL VARIABLES [v] ************************ */
 extern id const NSApp;
 /* ************************ [^] GLOBAL VARIABLES [^] ************************ */
+
 /* ************************* [v] HELPER MACROS [v] ************************** */
-#	ifndef MSG
-#		define MSG(\
-			__MSG_ROUGHNESS__, \
-			__MSG_OPTION__, \
-			__MSG_SIZE__\
+#	ifndef OBJC
+#		define OBJC(\
+			__OBJC_ROUGHNESS__, \
+			__OBJC_OPTION__, \
+			__OBJC_SIZE__\
 		) (\
 			(\
-				__MSG_ROUGHNESS__(*)\
+				__OBJC_ROUGHNESS__(*)\
 				(\
 					id, \
 					SEL\
@@ -102,92 +104,102 @@ extern id const NSApp;
 			)\
 			objc_msgSend\
 		) (\
-			__MSG_OPTION__, \
-			sel_getUid(__MSG_SIZE__)\
+			__OBJC_OPTION__, \
+			sel_getUid(__OBJC_SIZE__)\
 		)
-#	endif /* MSG */
-#	ifndef MSG1
-#		define MSG1(\
-			__MSG1_ROUGHNESS__, \
-			__MSG1_OPTION__, \
-			__MSG1_SIZE__, \
-			__MSG1_A__, \
-			__MSG1_a__\
+#	endif /* OBJC */
+#	ifndef OBJC1
+#		define OBJC1(\
+			__OBJC1_ROUGHNESS__, \
+			__OBJC1_OPTION__, \
+			__OBJC1_SIZE__, \
+			__OBJC1_A__, \
+			__OBJC1_a__\
 		) (\
 			(\
-				__MSG1_ROUGHNESS__(*)\
+				__OBJC1_ROUGHNESS__(*)\
 				(\
 					id, \
 					SEL, \
-					__MSG1_A__\
+					__OBJC1_A__\
 				)\
 			)\
 			objc_msgSend\
 		) (\
-			__MSG1_OPTION__, \
-			sel_getUid(__MSG1_SIZE__), \
-			__MSG1_a__\
+			__OBJC1_OPTION__, \
+			sel_getUid(__OBJC1_SIZE__), \
+			__OBJC1_a__\
 		)
-#	endif /* MSG1 */
-#	ifndef MSG4
-#		define MSG4(\
-			__MSG4_ROUGHNESS__, \
-			__MSG4_OPTION__, \
-			__MSG4_SIZE__, \
-			__MSG4_A__, \
-			__MSG4_a__, \
-			__MSG4_B__, \
-			__MSG4_b__, \
-			__MSG4_C__, \
-			__MSG4_c__, \
-			__MSG4_D__, \
-			__MSG4_d__\
+#	endif /* OBJC1 */
+#	ifndef OBJC4
+#		define OBJC4(\
+			__OBJC4_ROUGHNESS__, \
+			__OBJC4_OPTION__, \
+			__OBJC4_SIZE__, \
+			__OBJC4_A__, \
+			__OBJC4_a__, \
+			__OBJC4_B__, \
+			__OBJC4_b__, \
+			__OBJC4_C__, \
+			__OBJC4_c__, \
+			__OBJC4_D__, \
+			__OBJC4_d__\
 		) (\
 			(\
-				__MSG4_ROUGHNESS__(*)\
+				__OBJC4_ROUGHNESS__(*)\
 				(\
 					id, \
 					SEL, \
-					__MSG4_A__, \
-					__MSG4_B__, \
-					__MSG4_C__, \
-					__MSG4_D__\
+					__OBJC4_A__, \
+					__OBJC4_B__, \
+					__OBJC4_C__, \
+					__OBJC4_D__\
 				)\
 			)\
 			objc_msgSend\
 		) (\
-			__MSG4_OPTION__, \
-			sel_getUid(__MSG4_SIZE__), \
-			__MSG4_a__, \
-			__MSG4_b__, \
-			__MSG4_c__, \
-			__MSG4_d__\
+			__OBJC4_OPTION__, \
+			sel_getUid(__OBJC4_SIZE__), \
+			__OBJC4_a__, \
+			__OBJC4_b__, \
+			__OBJC4_c__, \
+			__OBJC4_d__\
 		)
-#	endif /* MSG4 */
+#	endif /* OBJC4 */
 #	ifndef REFRESH_SCREEN
 #		define REFRESH_SCREEN(__REFRESH_SCREEN_PARAMTER__) (\
 			(id)objc_getClass(__REFRESH_SCREEN_PARAMTER__)\
 		)
 #	endif /* REFRESH_SCREEN */
 /* ************************* [^] HELPER MACROS [^] ************************** */
+
 /* *************************** [v] PROTOTYPES [v] *************************** */
-extern INLINE void	GRAPHIC_DRAW_RECT(const id VIEW, const SEL SELECTOR, \
-const CGRect RECT);
-extern INLINE BOOL	WINDOW_SHOULD_CLOSE(const id VIEW, const SEL SELECTOR, \
-const id WINDOW);
+extern INLINE void	GRAPHIC_DRAW_RECT(
+	const id VIEW,
+	const SEL SELECTOR,
+	const CGRect RECT
+);
+extern INLINE BOOL	WINDOW_SHOULD_CLOSE(
+	const id VIEW,
+	const SEL SELECTOR,
+	const id WINDOW
+);
 /* *************************** [^] PROTOTYPES [^] *************************** */
 
 int
-	WINDOW_OPEN(struct GRAPHIC *GRAPHIC, register unsigned int WIDTH, \
-register unsigned int HEIGHT)
+	WINDOW_OPEN(
+	struct GRAPHIC *GRAPHIC,
+	register unsigned int WIDTH,
+	register unsigned int HEIGHT
+)
 {
-	Class    (VOYAGER);
-	Class (VIEW_CLASS);
-	id         (TITLE);
-	id          (VIEW);
+	Class	VOYAGER;
+	Class	VIEW_CLASS;
+	id		TITLE;
+	id		VIEW;
 
-	GRAPHIC->BUFFER = (unsigned int *)malloc(\
-		sizeof(unsigned int) * (WIDTH * HEIGHT + 1));
+	GRAPHIC->BUFFER = (unsigned int *)
+		malloc(sizeof(unsigned int) * (WIDTH * HEIGHT + 1));
 
 	if (!GRAPHIC->BUFFER)
 		return (-1);
@@ -202,29 +214,29 @@ register unsigned int HEIGHT)
 	PREFETCH_RANGE(GRAPHIC->BUFFER, WIDTH * HEIGHT);
 	GRAPHIC->WIDTH = WIDTH;
 	GRAPHIC->HEIGHT = HEIGHT;
-	MSG(id, REFRESH_SCREEN("NSApplication"), "sharedApplication");
-	MSG1(void, NSApp, "setActivationPolicy:", NSInteger, 0);
-	GRAPHIC->WINDOW_MODULE = MSG4(\
-		id, \
-		MSG(\
-			id, \
-			REFRESH_SCREEN("NSWindow"), \
-			"alloc"\
-		), \
-		"initWithContentRect:styleMask:backing:defer:", \
-		CGRect, \
-		CGRectMake(\
-			0, \
-			0, \
-			GRAPHIC->WIDTH, \
-			GRAPHIC->HEIGHT\
-		), \
-		NSUInteger, \
-		3, \
-		NSUInteger, \
-		2, \
-		BOOL, \
-		NO\
+	OBJC(id, REFRESH_SCREEN("NSApplication"), "sharedApplication");
+	OBJC1(void, NSApp, "setActivationPolicy:", NSInteger, 0);
+	GRAPHIC->WINDOW_MODULE = OBJC4(
+		id,
+		OBJC(
+			id,
+			REFRESH_SCREEN("NSWindow"),
+			"alloc"
+		),
+		"initWithContentRect:styleMask:backing:defer:",
+		CGRect,
+		CGRectMake(
+			0,
+			0,
+			GRAPHIC->WIDTH,
+			GRAPHIC->HEIGHT
+		),
+		NSUInteger,
+		3,
+		NSUInteger,
+		2,
+		BOOL,
+		NO
 	);
 
 	if (!GRAPHIC->WINDOW_MODULE)
@@ -235,10 +247,10 @@ register unsigned int HEIGHT)
 		return (-1);
 	}
 
-	VOYAGER = objc_allocateClassPair(\
-		(Class)REFRESH_SCREEN("NSObject"), \
-		"WindowDelegate", \
-		0\
+	VOYAGER = objc_allocateClassPair(
+		(Class)REFRESH_SCREEN("NSObject"),
+		"WindowDelegate",
+		0
 	);
 
 	if (!VOYAGER)
@@ -247,32 +259,32 @@ register unsigned int HEIGHT)
 		return (-1);
 	}
 
-	class_addMethod(\
-		VOYAGER, \
-		sel_getUid("windowShouldClose:"), \
-		(IMP)WINDOW_SHOULD_CLOSE, \
-		"c@:@"\
+	class_addMethod(
+		VOYAGER,
+		sel_getUid("windowShouldClose:"),
+		(IMP)WINDOW_SHOULD_CLOSE,
+		"c@:@"
 	);
 	objc_registerClassPair(VOYAGER);
-	MSG1(\
-		void, \
-		GRAPHIC->WINDOW_MODULE, \
-		"setDelegate:", \
-		id, \
-		MSG(\
-			id, \
-			MSG(\
-				id, \
-				(id)VOYAGER, \
-				"alloc"\
-			), \
-			"init"\
-		)\
+	OBJC1(
+		void,
+		GRAPHIC->WINDOW_MODULE,
+		"setDelegate:",
+		id,
+		OBJC(
+			id,
+			OBJC(
+				id,
+				(id)VOYAGER,
+				"alloc"
+			),
+			"init"
+		)
 	);
-	VIEW_CLASS = objc_allocateClassPair(\
-		(Class)REFRESH_SCREEN("NSView"), \
-		"WindowView", \
-		0\
+	VIEW_CLASS = objc_allocateClassPair(
+		(Class)REFRESH_SCREEN("NSView"),
+		"WindowView",
+		0
 	);
 
 	if (!VIEW_CLASS)
@@ -281,21 +293,21 @@ register unsigned int HEIGHT)
 		return (-1);
 	}
 
-	class_addMethod(\
-		VIEW_CLASS, \
-		sel_getUid("drawRect:"), \
-		(IMP)GRAPHIC_DRAW_RECT, \
-		"i@:@@"\
+	class_addMethod(
+		VIEW_CLASS,
+		sel_getUid("drawRect:"),
+		(IMP)GRAPHIC_DRAW_RECT,
+		"i@:@@"
 	);
 	objc_registerClassPair(VIEW_CLASS);
-	VIEW = MSG(\
-		id, \
-		MSG(\
-			id, \
-			(id)VIEW_CLASS, \
-			"alloc"\
-		), \
-		"init"\
+	VIEW = OBJC(
+		id,
+		OBJC(
+			id,
+			(id)VIEW_CLASS,
+			"alloc"
+		),
+		"init"
 	);
 
 	if (!VIEW)
@@ -305,19 +317,19 @@ register unsigned int HEIGHT)
 		return (-1);
 	}
 
-	MSG1(void, GRAPHIC->WINDOW_MODULE, "setContentView:", id, VIEW);
-	objc_setAssociatedObject(\
-		VIEW, \
-		"GRAPHIC", \
-		(id)GRAPHIC, \
-		OBJC_ASSOCIATION_ASSIGN\
+	OBJC1(void, GRAPHIC->WINDOW_MODULE, "setContentView:", id, VIEW);
+	objc_setAssociatedObject(
+		VIEW,
+		"GRAPHIC",
+		(id)GRAPHIC,
+		OBJC_ASSOCIATION_ASSIGN
 	);
-	TITLE = MSG1(\
-		id, \
-		REFRESH_SCREEN("NSString"), \
-		"stringWithUTF8String:", \
-		const char *, \
-		GRAPHIC->TITLE\
+	TITLE = OBJC1(
+		id,
+		REFRESH_SCREEN("NSString"),
+		"stringWithUTF8String:",
+		const char *,
+		GRAPHIC->TITLE
 	);
 	GRAPHIC->COLOR_SPACE = CGColorSpaceCreateDeviceRGB();
 
@@ -327,11 +339,11 @@ register unsigned int HEIGHT)
 		return (-1);
 	}
 
-	GRAPHIC->IMAGE_PROVIDER = CGDataProviderCreateWithData(\
-		((void *)0), \
-		GRAPHIC->BUFFER, \
-		(GRAPHIC->WIDTH * GRAPHIC->HEIGHT) << 2, \
-		((void *)0)\
+	GRAPHIC->IMAGE_PROVIDER = CGDataProviderCreateWithData(
+		((void *)0),
+		GRAPHIC->BUFFER,
+		(GRAPHIC->WIDTH * GRAPHIC->HEIGHT) << 2,
+		((void *)0)
 	);
 
 	if (!GRAPHIC->IMAGE_PROVIDER)
@@ -340,11 +352,16 @@ register unsigned int HEIGHT)
 		return (-1);
 	}
 
-	MSG1(void, GRAPHIC->WINDOW_MODULE, "setTitle:", id, TITLE);
-	MSG1(void, GRAPHIC->WINDOW_MODULE, "makeKeyAndOrderFront:", id, \
-		((void *)0));
-	MSG(void, GRAPHIC->WINDOW_MODULE, "center");
-	MSG1(void, NSApp, "activateIgnoringOtherApps:", BOOL, YES);
+	OBJC1(void, GRAPHIC->WINDOW_MODULE, "setTitle:", id, TITLE);
+	OBJC1(
+		void,
+		GRAPHIC->WINDOW_MODULE,
+		"makeKeyAndOrderFront:",
+		id,
+		((void *)0)
+	);
+	OBJC(void, GRAPHIC->WINDOW_MODULE, "center");
+	OBJC1(void, NSApp, "activateIgnoringOtherApps:", BOOL, YES);
 	GRAPHIC->CANVAS_INFO = CGRectMake(0, 0, GRAPHIC->WIDTH, GRAPHIC->HEIGHT);
 	return (0);
 }
@@ -352,45 +369,45 @@ register unsigned int HEIGHT)
 extern INLINE void
 	GRAPHIC_DRAW_RECT(const id VIEW, const SEL SELECTOR, const CGRect RECT)
 {
-	static struct GRAPHIC *(GRAPHIC) = ((void *)0);
-	CGContextRef           (CONTEXT);
-	CGImageRef               (IMAGE);
+	static struct GRAPHIC	*GRAPHIC = ((void *)0);
+	CGContextRef			CONTEXT;
+	CGImageRef				IMAGE;
 
-	IGNORE RECT;
-	IGNORE SELECTOR;
+	IGNORE	RECT;
+	IGNORE	SELECTOR;
 
 	if (!GRAPHIC)
 		GRAPHIC = (struct GRAPHIC *)objc_getAssociatedObject(VIEW, "GRAPHIC");
 
-	CONTEXT = MSG(\
-		CGContextRef, \
-		MSG(\
-			id, \
-			REFRESH_SCREEN("NSGraphicsContext"), \
-			"currentContext"\
-		), \
-		"graphicsPort"\
+	CONTEXT = OBJC(
+		CGContextRef,
+		OBJC(
+			id,
+			REFRESH_SCREEN("NSGraphicsContext"),
+			"currentContext"
+		),
+		"graphicsPort"
 	);
-	IMAGE = CGImageCreate(\
-		GRAPHIC->WIDTH, \
-		GRAPHIC->HEIGHT, \
-		8, \
-		32, \
-		GRAPHIC->WIDTH << 2, \
-		GRAPHIC->COLOR_SPACE, \
-		(\
-			kCGImageAlphaNoneSkipFirst | \
-			kCGBitmapByteOrder32Little\
-		), \
-		GRAPHIC->IMAGE_PROVIDER, \
-		((void *)0), \
-		false, \
-		kCGRenderingIntentDefault\
+	IMAGE = CGImageCreate(
+		GRAPHIC->WIDTH,
+		GRAPHIC->HEIGHT,
+		8,
+		32,
+		GRAPHIC->WIDTH << 2,
+		GRAPHIC->COLOR_SPACE,
+		(
+			kCGImageAlphaNoneSkipFirst |
+			kCGBitmapByteOrder32Little
+		),
+		GRAPHIC->IMAGE_PROVIDER,
+		((void *)0),
+		false,
+		kCGRenderingIntentDefault
 	);
-	CGContextDrawImage(\
-		CONTEXT, \
-		GRAPHIC->CANVAS_INFO, \
-		IMAGE\
+	CGContextDrawImage(
+		CONTEXT,
+		GRAPHIC->CANVAS_INFO,
+		IMAGE
 	);
 	CGImageRelease(IMAGE);
 }
@@ -398,13 +415,14 @@ extern INLINE void
 extern INLINE BOOL
 	WINDOW_SHOULD_CLOSE(const id VIEW, const SEL SELECTOR, const id WINDOW)
 {
-	IGNORE VIEW;
-	IGNORE SELECTOR;
-	IGNORE WINDOW;
+	IGNORE	VIEW;
+	IGNORE	SELECTOR;
+	IGNORE	WINDOW;
 
-	MSG1(void, NSApp, "terminate:", id, NSApp);
+	OBJC1(void, NSApp, "terminate:", id, NSApp);
 	return (YES);
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__WINDOW_OPEN_C */

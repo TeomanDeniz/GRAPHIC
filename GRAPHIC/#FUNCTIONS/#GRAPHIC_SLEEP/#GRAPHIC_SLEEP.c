@@ -14,6 +14,12 @@
 
 #define GRAPHIC_FUNCTIONS__GRAPHIC_SLEEP_C /* SEALER */
 
+/* **************************** [v] INCLUDES [v] **************************** */
+#include "../../LIBCMT/ATTRIBUTES/REGPARM.h" /*
+# define REGPARM()
+#        */
+/* **************************** [^] INCLUDES [^] **************************** */
+
 #if (defined(__APPLE__) && !defined(X11))
 #	include "#GRAPHIC_SLEEP_MACOS.h"
 #else
@@ -34,8 +40,14 @@
 #endif /* APPLE */
 
 /* ***************************** [V] LOWERCASE [V] ************************** */
-void
+#	ifdef __STDC__ /* STANDARD C */
+void REGPARM(1)
 	graphic_sleep(register long milliseconds)
+#	else /* K&R */
+void REGPARM(1)
+	graphic_sleep(milliseconds)
+	register long	milliseconds;
+#	endif /* __STDC__ */
 {
 	GRAPHIC_SLEEP(milliseconds);
 }

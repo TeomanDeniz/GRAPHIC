@@ -14,7 +14,7 @@
 # +.....................++.....................+ #                             #
 # : C - Maximum Tension :: Create - 2023/05/25 : #                             #
 # :---------------------::---------------------: #                             #
-# : License - APACHE 2  :: Update - 2024/05/25 : #                             #
+# : License - APACHE 2  :: Update - 2025/03/13 : #                             #
 # +.....................++.....................+ #                             #
 \******************************************************************************/
 
@@ -40,7 +40,7 @@ int
 
 	WINDOW_OPEN(&GRAPHIC);  // OPEN WINDOW
 
-		GRAPHIC_PIXEL(&GRAPHIC, 200, 200, 0XFFFFFF); // PUT A WHITE PIXEL
+		PUT_PIXEL(&GRAPHIC, 200, 200, 0XFFFFFF); // PUT A WHITE PIXEL
 
 		WINDOW_TITLE(&GRAPHIC, "ANOTHER TEST TITLE"); // EDIT WINDOW TITLE
 
@@ -50,15 +50,18 @@ int
 */
 
 #ifndef GRAPHIC_H
+
 /* *************************** [v] TI CGT CCS [v] *************************** */
 #	ifdef __TI_COMPILER_VERSION__
 #		error "TI COMPILER DOES NOT SUPPORT GRAPHIC LIBRARY!!!"
 #	endif /* __TI_COMPILER_VERSION__ */
 /* *************************** [^] TI CGT CCS [^] *************************** */
+
 #	ifdef __cplusplus /* C++ */
 		extern "C" {
 #	endif /* __cplusplus */
-#	define GRAPHIC_H 202406 /* VERSION */
+#	define GRAPHIC_H 202503 /* VERSION */
+
 /* ************* [v] CHECK IF LIBRARY SUPPORTS THIS DEVICE [v] ************** */
 #	if !(defined(__APPLE__) || defined(__DJGPP__) || defined(_WIN32) || \
 		defined(__linux__) || defined(__gnu_linux__) || \
@@ -67,6 +70,7 @@ int
 #		error "THIS OS OR DEVICE DOES NOT SUPPORT ANY GRAPHICS"
 #	endif
 /* ************* [^] CHECK IF LIBRARY SUPPORTS THIS DEVICE [^] ************** */
+
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "GRAPHIC/#STRUCT.h" /*
 #	 struct graphic;
@@ -81,6 +85,7 @@ int
 #		        */
 #	endif /* __DJGPP__ */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 /* *************************** [v] PUT_PIXEL [v] **************************** */
 #	ifdef __DJGPP__
 #		define PUT_PIXEL(\
@@ -143,46 +148,104 @@ int
 /* *************************** [v] FUNCTIONS [v] **************************** */
 extern int	GRAPHIC_LOOP(struct GRAPHIC *GRAPHIC);
 extern int	graphic_loop(struct graphic *graphic);
+
 extern void	GRAPHIC_SLEEP(register long MILLISECONDS);
 extern void	graphic_sleep(register long milliseconds);
+
 extern long	GRAPHIC_TIME(void);
 extern long	graphic_time(void);
-extern void	WINDOW_CLOSE(struct GRAPHIC *GRAPHIC);
-extern void	window_close(struct graphic *graphic);
-extern int	WINDOW_OPEN(struct GRAPHIC *GRAPHIC, register unsigned int WIDTH, \
-register unsigned int HEIGHT);
-extern int	window_open(struct graphic *graphic, register unsigned int width, \
-register unsigned int height);
-extern int	WINDOW_TITLE(struct GRAPHIC *GRAPHIC, char *TITLE);
-extern int	window_title(struct graphic *graphic, char *title);
+
+extern void	WINDOW_CLOSE(struct GRAPHIC *const GRAPHIC);
+extern void	window_close(struct graphic *const graphic);
+
+extern int	WINDOW_OPEN(
+	struct GRAPHIC *const GRAPHIC,
+	register unsigned int WIDTH,
+	register unsigned int HEIGHT
+);
+extern int	window_open(
+	struct graphic *const graphic,
+	register unsigned int width,
+	register unsigned int height
+);
+
+extern int	WINDOW_TITLE(
+	struct GRAPHIC *const GRAPHIC,
+	char *const TITLE
+);
+extern int	window_title(
+	struct graphic *const graphic,
+	char *const title
+);
+
 extern void	*GRAPHIC_INIT(void);
+
 extern void	*graphic_init(void);
-extern void	GRAPHIC_SETUP(struct GRAPHIC *GRAPHIC);
-extern void	graphic_setup(struct graphic *graphic);
+
+extern void	GRAPHIC_SETUP(struct GRAPHIC *const GRAPHIC);
+
+extern void	graphic_setup(struct graphic *const graphic);
 /* *************************** [^] FUNCTIONS [^] **************************** */
+
 /* ************************** [v] EVENT HOOKS [v] *************************** */
-extern void	EVENT_HOOK_CLOSE(struct GRAPHIC *GRAPHIC, int (*F)(void *), \
-void *ARG);
-extern void	event_hook_close(struct graphic *graphic, int (*f)(void *), \
-void *arg);
-extern void	EVENT_HOOK_KEY_DOWN(struct GRAPHIC *GRAPHIC, \
-int (*F)(unsigned int, void *), void *ARG);
-extern void	event_hook_key_down(struct graphic *graphic, \
-int (*f)(unsigned int, void *), void *arg);
-extern void	EVENT_HOOK_KEY_UP(struct GRAPHIC *GRAPHIC, \
-int (*F)(unsigned int, void *), void *ARG);
-extern void	event_hook_key_up(struct graphic *graphic, \
-int (*f)(unsigned int, void *), void *arg);
-extern void	EVENT_HOOK_LOOP(struct GRAPHIC *GRAPHIC, int (*F)(void *), \
-void *ARG);
-extern void	event_hook_loop(struct graphic *graphic, int (*f)(void *), \
-void *arg);
-extern void	EVENT_HOOK_MOUSE(struct GRAPHIC *GRAPHIC, \
-int (*F)(unsigned int, unsigned int, unsigned char, void *), void *ARG);
-extern void	event_hook_mouse(struct graphic *graphic, \
-int (*f)(unsigned int, unsigned int, unsigned char, void *), void *arg);
+extern void	EVENT_HOOK_CLOSE(
+	const struct GRAPHIC *const GRAPHIC,
+	int (*F)(void *),
+	void *ARG
+);
+extern void	event_hook_close(
+	const struct graphic *const graphic,
+	int (*f)(void *),
+	void *arg
+);
+
+extern void	EVENT_HOOK_KEY_DOWN(
+	const struct GRAPHIC *const GRAPHIC,
+	int (*F)(unsigned int, void *),
+	void *ARG
+);
+extern void	event_hook_key_down(
+	struct graphic *const graphic,
+	int (*f)(unsigned int, void *),
+	void *arg
+);
+
+extern void	EVENT_HOOK_KEY_UP(
+	struct GRAPHIC *const GRAPHIC,
+	int (*F)(unsigned int, void *),
+	void *ARG
+);
+extern void	event_hook_key_up(
+	struct graphic *const graphic,
+	int (*f)(unsigned int, void *),
+	void *arg
+);
+
+extern void	EVENT_HOOK_LOOP(
+	struct GRAPHIC *const GRAPHIC,
+	int (*F)(void *),
+	void *ARG
+);
+extern void	event_hook_loop(
+	struct graphic *const graphic,
+	int (*f)(void *),
+	void *arg
+);
+
+extern void	EVENT_HOOK_MOUSE(
+	struct GRAPHIC *const GRAPHIC,
+	int (*F)(unsigned int, unsigned int, unsigned char, void *),
+	void *ARG
+);
+extern void	event_hook_mouse(
+	struct graphic *const graphic,
+	int (*f)(unsigned int, unsigned int, unsigned char, void *),
+	void *arg
+);
 /* ************************** [^] EVENT HOOKS [^] *************************** */
+
 #	else /* !__STDC__ */
+
 /* *************************** [v] FUNCTIONS [v] **************************** */
 extern int	GRAPHIC_LOOP();
 extern int	graphic_loop();
@@ -201,6 +264,7 @@ extern void	*graphic_init();
 extern void	GRAPHIC_SETUP();
 extern void	graphic_setup();
 /* *************************** [^] FUNCTIONS [^] **************************** */
+
 /* ************************** [v] EVENT HOOKS [v] *************************** */
 extern void	EVENT_HOOK_CLOSE();
 extern void	event_hook_close();
@@ -213,7 +277,9 @@ extern void	event_hook_loop();
 extern void	EVENT_HOOK_MOUSE();
 extern void	event_hook_mouse();
 /* ************************** [^] EVENT HOOKS [^] *************************** */
+
 #	endif /* __STDC__ */
+
 /* *************************** [V] C++ CLASS [V] **************************** */
 #	ifdef __cplusplus /* C++ */
 		} /* C++ */

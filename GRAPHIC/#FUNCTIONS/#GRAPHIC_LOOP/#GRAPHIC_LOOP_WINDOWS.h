@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -18,52 +18,161 @@
 #	 struct GRAPHIC;
 #	        */
 #	include <winuser.h> /*
-#	 define PeekMessage
+#	 define PeekMessage(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg)
 #	 define PM_REMOVE
 #	 define WM_QUIT
-#	 define DispatchMessage
+#	 define DispatchMessage(lpMsg)
 #	typedef MSG;
+#	typedef LARGE_INTEGER;
 #	   BOOL TranslateMessage(MSG *);
 #	   BOOL InvalidateRect(HWND, LPCRECT, BOOL);
+#	   BOOL QueryPerformanceFrequency(LARGE_INTEGER *);
+#	   BOOL QueryPerformanceCounter(LARGE_INTEGER *);
+#	   BOOL UpdateWindow(HWND);
 #	        */
 #	include <windef.h> /*
 #	 define TRUE
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
-/* *************************** [v] PROTOTYPES [v] *************************** */
-static int	__GRAPHIC_LOOP__(struct GRAPHIC *GRAPHIC);
-/* *************************** [^] PROTOTYPES [^] *************************** */
+
 int
 	GRAPHIC_LOOP(struct GRAPHIC *GRAPHIC)
 {
+	MSG				EVENT_MSG = {0};
+	LARGE_INTEGER	FREQUENCY;
+	LARGE_INTEGER	START;
+	double			DELTA_FPS_LIMIT;
+
+	QueryPerformanceFrequency(&FREQUENCY);
+	QueryPerformanceCounter(&START);
+	DELTA_FPS_LIMIT = (1.0 / (double)GRAPHIC->FPS);
+
 	if (!!GRAPHIC->FUNCTION_LOOP)
 	{
-		while (!__GRAPHIC_LOOP__(GRAPHIC))
-			GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
+		if (GRAPHIC->WINDOW_STYLE.TRANSPARENCY)
+		{
+			while (PeekMessage(&EVENT_MSG, ((void *)0), 0, 0, PM_REMOVE) || 1)
+			{
+				LARGE_INTEGER	END;
+				register double	ELAPSED_TIME;
+
+				if (EVENT_MSG.message == WM_QUIT)
+					return (1);
+
+				TranslateMessage(&EVENT_MSG);
+				DispatchMessage(&EVENT_MSG);
+
+				QueryPerformanceCounter(&END);
+				ELAPSED_TIME = (double)(
+					(double)(
+						END.QuadPart - START.QuadPart
+					) / FREQUENCY.QuadPart
+				);
+
+				if (ELAPSED_TIME >= DELTA_FPS_LIMIT)
+				{
+					GRAPHIC->REFRESH_SCREEN(GRAPHIC);
+					QueryPerformanceCounter(&START);
+					GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
+				}
+			}
+		}
+		else
+		{
+			while (PeekMessage(&EVENT_MSG, ((void *)0), 0, 0, PM_REMOVE) || 1)
+			{
+				LARGE_INTEGER	END;
+				register double	ELAPSED_TIME;
+
+				if (EVENT_MSG.message == WM_QUIT)
+					return (1);
+
+				TranslateMessage(&EVENT_MSG);
+				DispatchMessage(&EVENT_MSG);
+
+				QueryPerformanceCounter(&END);
+				ELAPSED_TIME = (double)(
+					(double)(
+						END.QuadPart - START.QuadPart
+					) / FREQUENCY.QuadPart
+				);
+
+				if (ELAPSED_TIME >= DELTA_FPS_LIMIT)
+				{
+					if (GRAPHIC->WINDOW_HANDLE)
+					{
+						InvalidateRect(GRAPHIC->WINDOW_HANDLE, ((void *)0), 0);
+						UpdateWindow(GRAPHIC->WINDOW_HANDLE);
+					}
+
+					QueryPerformanceCounter(&START);
+					GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
+				}
+			}
+		}
 	}
 	else
-		while (!__GRAPHIC_LOOP__(GRAPHIC))
-			(void)0;
-	return (0);
-}
-
-static int
-	__GRAPHIC_LOOP__(struct GRAPHIC *GRAPHIC)
-{
-	MSG (MSG);
-
-	while (PeekMessage(&MSG, NULL, 0, 0, PM_REMOVE))
 	{
-		if (MSG.message == WM_QUIT)
-			return (1);
+		if (GRAPHIC->WINDOW_STYLE.TRANSPARENCY)
+		{
+			while (PeekMessage(&EVENT_MSG, ((void *)0), 0, 0, PM_REMOVE) || 1)
+			{
+				LARGE_INTEGER	END;
+				register double	ELAPSED_TIME;
 
-		TranslateMessage(&MSG);
-		DispatchMessage(&MSG);
+				if (EVENT_MSG.message == WM_QUIT)
+					return (1);
+
+				TranslateMessage(&EVENT_MSG);
+				DispatchMessage(&EVENT_MSG);
+
+				QueryPerformanceCounter(&END);
+				ELAPSED_TIME = (double)(
+					(double)(
+						END.QuadPart - START.QuadPart
+					) / FREQUENCY.QuadPart
+				);
+
+				if (ELAPSED_TIME >= DELTA_FPS_LIMIT)
+				{
+					GRAPHIC->REFRESH_SCREEN(GRAPHIC);
+					QueryPerformanceCounter(&START);
+				}
+			}
+		}
+		else
+		{
+			while (PeekMessage(&EVENT_MSG, ((void *)0), 0, 0, PM_REMOVE) || 1)
+			{
+				LARGE_INTEGER	END;
+				register double	ELAPSED_TIME;
+
+				if (EVENT_MSG.message == WM_QUIT)
+					return (1);
+
+				TranslateMessage(&EVENT_MSG);
+				DispatchMessage(&EVENT_MSG);
+
+				QueryPerformanceCounter(&END);
+				ELAPSED_TIME = (double)(
+					(double)(
+						END.QuadPart - START.QuadPart
+					) / FREQUENCY.QuadPart
+				);
+
+				if (ELAPSED_TIME >= DELTA_FPS_LIMIT)
+				{
+					InvalidateRect(GRAPHIC->WINDOW_HANDLE, ((void *)0), 0);
+					UpdateWindow(GRAPHIC->WINDOW_HANDLE);
+					QueryPerformanceCounter(&START);
+				}
+			}
+		}
 	}
 
-	InvalidateRect(GRAPHIC->WINDOW_HANDLE, NULL, TRUE);
 	return (0);
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C */

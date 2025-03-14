@@ -46,14 +46,14 @@
 extern id const NSApp;
 /* ************************ [^] GLOBAL VARIABLES [^] ************************ */
 /* ************************* [v] HELPER MACROS [v] ************************** */
-#	ifndef MSG
-#		define MSG(\
-			__MSG_ROUGHNESS__, \
-			__MSG_OPTION__, \
-			__MSG_SIZE__\
+#	ifndef OBJC
+#		define OBJC(\
+			__OBJC_ROUGHNESS__, \
+			__OBJC_OPTION__, \
+			__OBJC_SIZE__\
 		) (\
 			(\
-				__MSG_ROUGHNESS__(*)\
+				__OBJC_ROUGHNESS__(*)\
 				(\
 					id, \
 					SEL\
@@ -61,36 +61,14 @@ extern id const NSApp;
 			)\
 			objc_msgSend\
 		) (\
-			__MSG_OPTION__, \
-			sel_getUid(__MSG_SIZE__)\
+			__OBJC_OPTION__, \
+			sel_getUid(__OBJC_SIZE__)\
 		)
-#	endif /* MSG */
-#	ifndef MSG1
-#		define MSG1(\
-			__MSG1_ROUGHNESS__, \
-			__MSG1_OPTION__, \
-			__MSG1_SIZE__, \
-			__MSG1_A__, \
-			__MSG1_a__\
-		) (\
-			(\
-				__MSG1_ROUGHNESS__(*)\
-				(\
-					id, \
-					SEL, \
-					__MSG1_A__\
-				)\
-			)\
-			objc_msgSend\
-		) (\
-			__MSG1_OPTION__, \
-			sel_getUid(__MSG1_SIZE__), \
-			__MSG1_a__\
-		)
-#	endif /* MSG1 */
+#	endif /* OBJC */
 /* ************************* [^] HELPER MACROS [^] ************************** */
+
 void
-	WINDOW_CLOSE(struct GRAPHIC *GRAPHIC)
+	WINDOW_CLOSE(struct GRAPHIC *const GRAPHIC)
 {
 	pthread_mutex_lock(&GRAPHIC->CLOSE_THREAD_MUTEX);
 	GRAPHIC->CLOSE_THREAD = 1;
@@ -99,8 +77,8 @@ void
 
 	if (!!GRAPHIC->WINDOW_MODULE)
 	{
-		MSG(void, GRAPHIC->WINDOW_MODULE, "close");
-		MSG(void, GRAPHIC->WINDOW_MODULE, "release");
+		OBJC(void, GRAPHIC->WINDOW_MODULE, "close");
+		OBJC(void, GRAPHIC->WINDOW_MODULE, "release");
 		GRAPHIC->WINDOW_MODULE = ((void *)0);
 	}
 
@@ -116,14 +94,14 @@ void
 	if (!!GRAPHIC->TIMER_ID)
 	{
 		CFRunLoopTimerInvalidate(GRAPHIC->TIMER_ID);
-		MSG(void, (id)GRAPHIC->TIMER_ID, "release"); // Thx MiniLibX!!!
+		OBJC(void, (id)GRAPHIC->TIMER_ID, "release"); // Thx MiniLibX!!!
 		GRAPHIC->TIMER_ID = ((void *)0);
 	}
 
 	if (!!GRAPHIC->OBSERVER_ID)
 	{
 		CFRunLoopObserverInvalidate(GRAPHIC->OBSERVER_ID);
-		MSG(void, (id)GRAPHIC->OBSERVER_ID, "release");
+		OBJC(void, (id)GRAPHIC->OBSERVER_ID, "release");
 		GRAPHIC->OBSERVER_ID = ((void *)0);
 	}
 
@@ -139,6 +117,7 @@ void
 		GRAPHIC->IMAGE_PROVIDER = ((void *)0);
 	}
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__WINDOW_CLOSE_C */

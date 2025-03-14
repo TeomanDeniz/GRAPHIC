@@ -25,27 +25,32 @@
 #	    int __dpmi_int(int, __dpmi_regs *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 #	ifdef __STDC__ /* STANDARD C */
 int
-	WINDOW_OPEN(struct GRAPHIC *GRAPHIC, register unsigned int WIDTH, \
-register unsigned int HEIGHT)
+	WINDOW_OPEN(
+	struct GRAPHIC *GRAPHIC,
+	register unsigned int WIDTH,
+	register unsigned int HEIGHT
+)
 #	else /* K&R */
 void
 	WINDOW_OPEN(GRAPHIC, WIDTH, HEIGHT)
 
-	struct GRAPHIC *(GRAPHIC);
-	register int      (WIDTH);
-	register int     (HEIGHT);
+	struct GRAPHIC	*GRAPHIC;
+	register int	WIDTH;
+	register int	HEIGHT;
 #	endif /* __STDC__ */
 {
-	IGNORE WIDTH;
-	IGNORE HEIGHT;
+	IGNORE	WIDTH;
+	IGNORE	HEIGHT;
 
-	__dpmi_regs (__REGISTER__);
+	__dpmi_regs	__REGISTER__;
 
 	__REGISTER__.x.ax = 19; /* 0X13 | 13H */
 	__dpmi_int(0X10, &__REGISTER__);
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__WINDOW_OPEN_C */

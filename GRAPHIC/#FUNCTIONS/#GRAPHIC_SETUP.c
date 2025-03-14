@@ -20,30 +20,57 @@
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
+#	ifdef __STDC__ /* STANDARD C */
 void
-	GRAPHIC_SETUP(struct GRAPHIC *GRAPHIC)
+	GRAPHIC_SETUP(struct GRAPHIC *const GRAPHIC)
+#	else /* K&R */
+void
+	GRAPHIC_SETUP(GRAPHIC)
+	struct GRAPHIC	*GRAPHIC;
+#	endif /* __STDC__ */
 {
-	register unsigned int  (INDEX);
-	register unsigned int (SIZEOF);
-	char         *(GRAPHIC_MEMORY);
+	register unsigned int	INDEX;
+	register unsigned int	SIZEOF;
+	char					*GRAPHIC_MEMORY;
 
 	if (!GRAPHIC)
 		return ;
 
 	SIZEOF = sizeof(struct GRAPHIC);
 	GRAPHIC_MEMORY = (char *)GRAPHIC;
-	INDEX = (unsigned int)-1;
+	INDEX = (unsigned int)0;
 
-	while (++INDEX, INDEX < SIZEOF)
+	while (INDEX < SIZEOF)
+	{
 		GRAPHIC_MEMORY[INDEX] = 0;
+		++INDEX;
+	}
 
 	WINDOW_TITLE(GRAPHIC, ((void *)0));
 	GRAPHIC->FPS_START_TIME = GRAPHIC_TIME();
+	GRAPHIC->FPS = 60;
+	GRAPHIC->WINDOW_STYLE.BORDER = 1;
+	GRAPHIC->WINDOW_STYLE.TRANSPARENCY = 0;
+	GRAPHIC->WINDOW_STYLE.RESIZABLE = 1;
+	GRAPHIC->WINDOW_STYLE.MINIMIZABLE = 1;
+	GRAPHIC->WINDOW_STYLE.MAXIMIZABLE = 1;
+	GRAPHIC->WINDOW_STYLE.CLOSEBUTTON = 1;
+	GRAPHIC->WINDOW_STYLE.FOCUSABLE = 1;
+	GRAPHIC->WINDOW_STYLE.TOPMOST = 0;
+	GRAPHIC->WINDOW_STYLE.TOOLWINDOW = 0;
+	GRAPHIC->WINDOW_STYLE.HIDEONCREATE = 0;
+	GRAPHIC->WINDOW_STYLE.CLIENTEDGE = 0;
 }
 
 /* ***************************** [V] LOWERCASE [V] ************************** */
+#	ifdef __STDC__ /* STANDARD C */
 void
-	graphic_setup(struct graphic *graphic)
+	graphic_setup(struct graphic *const graphic)
+#	else /* K&R */
+void
+	graphic_setup(graphic)
+	struct graphic	*graphic;
+#	endif /* __STDC__ */
 {
 	GRAPHIC_SETUP((struct GRAPHIC *)graphic);
 }

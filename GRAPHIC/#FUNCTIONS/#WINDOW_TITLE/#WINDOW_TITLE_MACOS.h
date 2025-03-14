@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/06/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/12 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -26,6 +26,7 @@
 #	  Class objc_getClass(const char *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 /* ************************* [v] HELPER MACROS [v] ************************** */
 #	ifndef MSG1
 #		define MSG1(\
@@ -56,12 +57,12 @@
 		)
 #	endif /* REFRESH_SCREEN */
 /* ************************* [^] HELPER MACROS [^] ************************** */
+
 int
-	WINDOW_TITLE(struct GRAPHIC *GRAPHIC, char *TITLE)
+	WINDOW_TITLE(struct GRAPHIC *const GRAPHIC, const char *const TITLE)
 {
-	id               (TITLE_ID);
-	static char (CURRENT_TITLE)[1024];
-	register int   (TITLE_SIZE);
+	id				TITLE_ID;
+	static char		CURRENT_TITLE[1024];
 
 	if (!GRAPHIC)
 		return (-1);
@@ -73,10 +74,15 @@ int
 	}
 	else
 	{
-		TITLE_SIZE = -1;
+		register int	TITLE_SIZE;
 
-		while (++TITLE_SIZE, TITLE[TITLE_SIZE] && TITLE_SIZE < 1023)
+		TITLE_SIZE = 0;
+
+		while (TITLE[TITLE_SIZE] && TITLE_SIZE < 1023)
+		{
 			CURRENT_TITLE[TITLE_SIZE] = TITLE[TITLE_SIZE];
+			++TITLE_SIZE;
+		}
 
 		CURRENT_TITLE[TITLE_SIZE] = 0;
 	}
@@ -85,11 +91,11 @@ int
 
 	if (!!GRAPHIC->WINDOW_MODULE)
 	{
-		TITLE_ID = MSG1(id, \
-			REFRESH_SCREEN("NSString"), \
-			"stringWithUTF8String:", \
-			char *, \
-			GRAPHIC->TITLE\
+		TITLE_ID = MSG1(id,
+			REFRESH_SCREEN("NSString"),
+			"stringWithUTF8String:",
+			char *,
+			GRAPHIC->TITLE
 		);
 		MSG1(void, GRAPHIC->WINDOW_MODULE, "setTitle:", id, TITLE_ID);
 	}

@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/06/08 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -45,9 +45,20 @@
 #endif /* APPLE */
 
 /* ***************************** [V] LOWERCASE [V] ************************** */
+#ifdef __STDC__ /* STANDARD C */
 int
-	window_open(struct graphic *graphic, register unsigned int width, \
-register unsigned int height)
+	window_open(
+	struct graphic *graphic,
+	register unsigned int width,
+	register unsigned int height
+)
+#else /* K&R */
+int
+	window_open(graphic, width, height)
+	struct graphic	*graphic;
+	register int	width;
+	register int	height;
+#endif /* __STDC__ */
 {
 	return (WINDOW_OPEN((struct GRAPHIC *)graphic, width, height));
 }

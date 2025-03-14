@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/05/25 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -19,6 +19,7 @@
 #	   void gettime(struct time *);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 #	ifdef __STDC__ /* STANDARD C */
 long
 	GRAPHIC_TIME(void)
@@ -27,8 +28,8 @@ long
 	GRAPHIC_TIME()
 #	endif /* __STDC__ */
 {
-	struct time (TIME);
-	long      (RESULT);
+	struct time	TIME;
+	long		RESULT;
 
 	gettime(&TIME);
 	RESULT = (long)TIME.ti_hund;
@@ -37,6 +38,7 @@ long
 	RESULT += (long)TIME.ti_hour * 360000L;
 	return (RESULT);
 }
+
 #else
 #	error "Please do not include this header directly!"
 #endif /* GRAPHIC_FUNCTIONS__GRAPHIC_TIME_C */

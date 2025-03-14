@@ -19,25 +19,25 @@
 #	        */
 #	include "../../LIBCMT/KEYWORDS/UNUSED.h" /*
 #	 define UNUSED
-#	 define NOPE
 #	        */
 #	include "../../LIBCMT/KEYWORDS/IGNORE.h" /*
 #	 define IGNORE
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
+
 #	ifdef __STDC__ /* STANDARD C */
 UNUSED int
-	WINDOW_TITLE(struct GRAPHIC *GRAPHIC, char *TITLE)
+	WINDOW_TITLE(struct GRAPHIC *const GRAPHIC, const char *const TITLE)
 #	else /* K&R */
 UNUSED int
 	WINDOW_TITLE(GRAPHIC, TITLE)
 
-	struct GRAPHIC *(GRAPHIC);
-	char             *(TITLE);
+	struct GRAPHIC	*GRAPHIC;
+	char			*TITLE;
 #	endif /* __STDC__ */
 {
-	IGNORE GRAPHIC;
-	IGNORE TITLE;
+	IGNORE	GRAPHIC;
+	IGNORE	TITLE;
 
 	return (0);
 }
