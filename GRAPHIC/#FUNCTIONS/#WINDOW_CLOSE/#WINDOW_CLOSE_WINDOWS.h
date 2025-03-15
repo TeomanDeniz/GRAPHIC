@@ -19,6 +19,7 @@
 #	        */
 #	include <winuser.h> /*
 #	   BOOL DestroyWindow(HWND);
+#	   BOOL KillTimer(HWND, UINT_PTR);
 #	        */
 #	include <stdlib.h> /*
 #	   void free(void *);
@@ -33,6 +34,7 @@ void
 
 	if (!!GRAPHIC->WINDOW_HANDLE)
 	{
+		KillTimer(GRAPHIC->WINDOW_HANDLE, 1);
 		DestroyWindow(GRAPHIC->WINDOW_HANDLE);
 		GRAPHIC->WINDOW_HANDLE = ((void *)0);
 	}

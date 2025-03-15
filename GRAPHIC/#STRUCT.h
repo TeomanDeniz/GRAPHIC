@@ -343,9 +343,12 @@ struct s_mouse
 };
 /* ************************* [^] struct s_mouse [^] ************************* */
 
-/* ********************* [v] struct S_WINDOW_STYLE [v] ********************** */
-struct	S_WINDOW_STYLE
+/* ************************ [v] struct S_WINDOW [v] ************************* */
+struct	S_WINDOW
 {
+	char			*TITLE;
+	unsigned int	WIDTH;
+	unsigned int	HEIGHT;
 	unsigned char	BORDER : 1;       // WINDOW HAS A BORDER
 	unsigned char	TRANSPARENCY : 1; // WINDOW IS TRANSPARENT
 	unsigned char	RESIZABLE : 1;    // WINDOW IS RESIZABLE
@@ -358,12 +361,31 @@ struct	S_WINDOW_STYLE
 	unsigned char	HIDEONCREATE : 1; // WINDOW IS HIDDEN ON CREATION
 	unsigned char	CLIENTEDGE : 6;   // WINDOW HAS A CLIENT EDGE(SUNKEN EFFECT)
 };
-/* ********************* [^] struct S_WINDOW_STYLE [^] ********************** */
+/* ************************ [^] struct S_WINDOW [^] ************************* */
+
+/* ************************ [v] struct s_window [v] ************************* */
+struct	s_window
+{
+	char			*title;
+	unsigned int	width;
+	unsigned int	height;
+	unsigned char	border : 1;       // WINDOW HAS A BORDER
+	unsigned char	transparency : 1; // WINDOW IS TRANSPARENT
+	unsigned char	resizable : 1;    // WINDOW IS RESIZABLE
+	unsigned char	minimizable : 1;  // WINDOW CAN BE MINIMIZED
+	unsigned char	maximizable : 1;  // WINDOW CAN BE MAXIMIZED
+	unsigned char	closebutton : 1;  // CLOSE BUTTON IS ENABLED
+	unsigned char	focusable : 1;    // WINDOW IS FOCUSABLE
+	unsigned char	topmost : 1;      // WINDOW IS ALWAYS ON TOP
+	unsigned char	toolwindow : 1;   // WINDOW IS A tool window
+	unsigned char	hiddencreate : 1; // WINDOW IS HIDDEN ON CREATION
+	unsigned char	clientedge : 6;   // WINDOW HAS A CLIENT EDGE(SUNKEN EFFECT)
+};
+/* ************************ [^] struct s_window [^] ************************* */
 
 /* ************************* [v] struct GRAPHIC [v] ************************* */
 struct GRAPHIC
 {
-	char					*TITLE;
 	int						WIDTH;
 	int						HEIGHT;
 	unsigned int			*BUFFER;
@@ -378,11 +400,14 @@ struct GRAPHIC
 	void					*FUNCTION_CLOSE_ARG;
 	int	(*FUNCTION_LOOP)(void *);
 	void					*FUNCTION_LOOP_ARG;
+	int	(*FUNCTION_RESIZE)(void *);
+	void					*FUNCTION_RESIZE_ARG;
 	int	(*FUNCTION_MOUSE)(unsigned int, unsigned int, unsigned char, void *);
 	void					*FUNCTION_MOUSE_ARG;
 	unsigned int			FPS_START_TIME;
 	unsigned int			FPS;
-	struct S_WINDOW_STYLE	WINDOW_STYLE;
+	char					WINDOW_RESIZING;
+	struct S_WINDOW			WINDOW;
 #	ifdef __APPLE__
 	id						WINDOW_MODULE;
 	id						EVENT;
@@ -419,7 +444,6 @@ struct GRAPHIC
 /* ************************* [v] struct graphic [v] ************************* */
 struct graphic
 {
-	char					*title;
 	int						width;
 	int						height;
 	unsigned int			*buffer;
@@ -434,11 +458,14 @@ struct graphic
 	void					*FUNCTION_CLOSE_ARG;
 	int	(*FUNCTION_LOOP)(void *);
 	void					*FUNCTION_LOOP_ARG;
+	int	(*FUNCTION_RESIZE)(void *);
+	void					*FUNCTION_RESIZE_ARG;
 	int	(*FUNCTION_MOUSE)(unsigned int, unsigned int, unsigned char, void *);
 	void					*FUNCTION_MOUSE_ARG;
 	unsigned int			FPS_START_TIME;
-	unsigned int			FPS;
-	struct S_WINDOW_STYLE	WINDOW_STYLE;
+	unsigned int			fps;
+	char					window_resizing;
+	struct s_window			window;
 #	ifdef __APPLE__
 	id						WINDOW_MODULE;
 	id						EVENT;

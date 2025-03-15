@@ -14,6 +14,12 @@
 
 #ifdef GRAPHIC_FUNCTIONS__WINDOW_OPEN_C
 /* **************************** [v] INCLUDES [v] **************************** */
+#	include "../../#STRUCT.h" /*
+#	 struct GRAPHIC;
+#	        */
+#	include "../../LIBCMT/KEYWORDS/IGNORE.h" /*
+#	 define IGNORE
+#	        */
 #	include <windef.h> /*
 #	 define CALLBACK
 #	 define HWND
@@ -45,12 +51,9 @@
 #	HGDIOBJ SelectObject(HDC, HGDIOBJ);
 #	    int SetDIBitsToDevice(HDC, int, int, DWORD, DWORD, int, int, UINT, UINT,
 >	        PCVOID, BITMAPINFO *, UINT);
-#	   BOOL BitBlt (HDC, int, int, int, int, HDC, int, int, DWORD);
+#	   BOOL StretchBlt(HDC, int, int, int, int, HDC, int, int, int, int DWORD);
 #	   BOOL DeleteObject(HGDIOBJ);
 #	   BOOL DeleteDC(HDC);
-#	        */
-#	include "../../#STRUCT.h" /*
-#	 struct GRAPHIC;
 #	        */
 #	include <winuser.h> /*
 #	 define GetWindowLongPtr(hWnd, nIndex)
@@ -82,6 +85,7 @@
 #	 define AC_SRC_ALPHA
 #	 define ULW_ALPHA
 #	 define GWLP_USERDATA
+#	typedef RECT;
 #	typedef POINT;
 #	typedef SIZE;
 #	typedef WNDCLASSEX;
@@ -97,6 +101,7 @@
 #	   BOOL UpdateLayeredWindow(HWND, HDC, POINT, SIZE, HDC, POINT, COLORREF,
 >	        	BLENDFUNCTION, DWORD);
 #	HBITMAP CreateDIBSection(HDC, BITMAPINFO, UINT, VOID, HANDLE, DWORD);
+#	   BOOL SetWindowPos(HWND, HWND, int, int, int, int, UINT);
 #	        */
 #	include <stdlib.h> /*
 #	typedef size_t;
@@ -112,6 +117,7 @@
 /* **************************** [^] INCLUDES [^] **************************** */
 
 /* *************************** [v] PROTOTYPES [v] *************************** */
+extern void				WINDOW_CLOSE(struct GRAPHIC *);
 extern void				*memset(void *, int, size_t);
 extern void				*memcpy (void *, const void *, size_t);
 static LRESULT CALLBACK	GRAPHIC_WINDOW_PROCESS_HANDLE(\
@@ -121,6 +127,7 @@ static LRESULT CALLBACK	GRAPHIC_WINDOW_PROCESS_HANDLE(\
 	const LPARAM L_PARAM
 );
 extern void				REFRESH_SCREEN(const struct GRAPHIC	*const GRAPHIC);
+extern int				IDLE_FUNCTION(void *ARG);
 /* *************************** [^] PROTOTYPES [^] *************************** */
 
 /* **************************** [v] STRUCTS [v] ***************************** */
@@ -138,12 +145,13 @@ int
 	register unsigned int HEIGHT
 )
 {
+	RECT				WINDOW_RECTANGLE = {0, 0, WIDTH, HEIGHT};
 	WNDCLASSEX			WINDOW_CLASS;
 	register HINSTANCE	HANDLE_INSTANCE;
 	register DWORD		WINDOW_STYLE;
 	register DWORD		EXTENDED_WINDOW_STYLE;
 
-	if (!GRAPHIC || !GRAPHIC->TITLE)
+	if (!GRAPHIC || !GRAPHIC->WINDOW.TITLE)
 		return (-1);
 
 	GRAPHIC->BUFFER = (unsigned int *)malloc(\
@@ -153,7 +161,15 @@ int
 	if (!GRAPHIC->BUFFER)
 		return (-2);
 
+	if (!GRAPHIC->FUNCTION_LOOP)
+		GRAPHIC->FUNCTION_LOOP = IDLE_FUNCTION;
+
+	if (!GRAPHIC->FUNCTION_RESIZE)
+		GRAPHIC->FUNCTION_RESIZE = IDLE_FUNCTION;
+
 	PREFETCH_RANGE(GRAPHIC->BUFFER, WIDTH * HEIGHT);
+	GRAPHIC->WINDOW.WIDTH = WIDTH;
+	GRAPHIC->WINDOW.HEIGHT = HEIGHT;
 	GRAPHIC->WIDTH = WIDTH;
 	GRAPHIC->HEIGHT = HEIGHT;
 	HANDLE_INSTANCE = GetModuleHandle((void *)0);
@@ -164,27 +180,27 @@ int
 	WINDOW_CLASS.style = CS_VREDRAW | CS_HREDRAW;
 	WINDOW_CLASS.lpfnWndProc = GRAPHIC_WINDOW_PROCESS_HANDLE;
 	WINDOW_CLASS.hInstance = HANDLE_INSTANCE;
-	WINDOW_CLASS.lpszClassName = GRAPHIC->TITLE;
+	WINDOW_CLASS.lpszClassName = GRAPHIC->WINDOW.TITLE;
 	WINDOW_CLASS.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
 	RegisterClassEx(&WINDOW_CLASS);
 
-	if (GRAPHIC->WINDOW_STYLE.TRANSPARENCY)
+	if (GRAPHIC->WINDOW.TRANSPARENCY)
 	{
 		WINDOW_STYLE |= WS_POPUP;
 		EXTENDED_WINDOW_STYLE |= WS_EX_LAYERED;
 		//EXTENDED_WINDOW_STYLE |= WS_EX_TRANSPARENT;
 	}
 
-	if (GRAPHIC->WINDOW_STYLE.TOPMOST)
+	if (GRAPHIC->WINDOW.TOPMOST)
 		EXTENDED_WINDOW_STYLE |= WS_EX_TOPMOST;
 
-	if (GRAPHIC->WINDOW_STYLE.CLIENTEDGE)
+	if (GRAPHIC->WINDOW.CLIENTEDGE)
 		EXTENDED_WINDOW_STYLE |= WS_EX_CLIENTEDGE;
 
-	if (GRAPHIC->WINDOW_STYLE.TOOLWINDOW)
+	if (GRAPHIC->WINDOW.TOOLWINDOW)
 		EXTENDED_WINDOW_STYLE |= WS_EX_TOOLWINDOW;
 
-	if (!GRAPHIC->WINDOW_STYLE.BORDER)
+	if (!GRAPHIC->WINDOW.BORDER)
 	{
 		WINDOW_STYLE &= ~WS_BORDER;
 		WINDOW_STYLE &= ~WS_CAPTION;
@@ -195,40 +211,47 @@ int
 		WINDOW_STYLE |= WS_CAPTION;
 	}
 
-	if (!GRAPHIC->WINDOW_STYLE.RESIZABLE)
+	if (!GRAPHIC->WINDOW.RESIZABLE)
 		WINDOW_STYLE &= ~WS_SIZEBOX;
 	else
 		WINDOW_STYLE |= WS_SIZEBOX;
 
-	if (!GRAPHIC->WINDOW_STYLE.MINIMIZABLE)
+	if (!GRAPHIC->WINDOW.MINIMIZABLE)
 		WINDOW_STYLE &= ~WS_MINIMIZEBOX;
 	else
 		WINDOW_STYLE |= WS_MINIMIZEBOX;
 
-	if (!GRAPHIC->WINDOW_STYLE.MAXIMIZABLE)
+	if (!GRAPHIC->WINDOW.MAXIMIZABLE)
 		WINDOW_STYLE &= ~WS_MAXIMIZEBOX;
 	else
 		WINDOW_STYLE |= WS_MAXIMIZEBOX;
 
-	if (!GRAPHIC->WINDOW_STYLE.CLOSEBUTTON)
+	if (!GRAPHIC->WINDOW.CLOSEBUTTON)
 		WINDOW_STYLE &= ~WS_SYSMENU;
 	else
 		WINDOW_STYLE |= WS_SYSMENU;
 
-	if (!GRAPHIC->WINDOW_STYLE.FOCUSABLE)
+	if (!GRAPHIC->WINDOW.FOCUSABLE)
 		WINDOW_STYLE &= ~WS_TABSTOP;
 	else
 		WINDOW_STYLE |= WS_TABSTOP;
 
+	AdjustWindowRectEx(
+		&WINDOW_RECTANGLE,
+		WINDOW_STYLE,
+		0,
+		EXTENDED_WINDOW_STYLE
+	);
+
 	GRAPHIC->WINDOW_HANDLE = CreateWindowEx(
 		EXTENDED_WINDOW_STYLE,
-		GRAPHIC->TITLE,
-		GRAPHIC->TITLE,
+		GRAPHIC->WINDOW.TITLE,
+		GRAPHIC->WINDOW.TITLE,
 		WINDOW_STYLE,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		GRAPHIC->WIDTH,
-		GRAPHIC->HEIGHT,
+		(WINDOW_RECTANGLE.right - WINDOW_RECTANGLE.left),
+		(WINDOW_RECTANGLE.bottom - WINDOW_RECTANGLE.top),
 		((void *)0),
 		((void *)0),
 		HANDLE_INSTANCE,
@@ -259,11 +282,15 @@ int
 
 	SetWindowPos(
 		GRAPHIC->WINDOW_HANDLE, 
-		NULL, 0, 0, 0, 0, 
+		NULL,
+		0,
+		0,
+		0,
+		0, 
 		SWP_NOSIZE | SWP_NOMOVE | SWP_FRAMECHANGED
 	);
 
-	if (GRAPHIC->WINDOW_STYLE.HIDEONCREATE)
+	if (GRAPHIC->WINDOW.HIDEONCREATE)
 		ShowWindow(GRAPHIC->WINDOW_HANDLE, SW_HIDE);
 	else
 		ShowWindow(GRAPHIC->WINDOW_HANDLE, SW_SHOW);
@@ -282,17 +309,17 @@ extern void
 	HBITMAP		HANDLE_BITMAP;
 	HBITMAP		HANDLE_OLD_BITMAP;
 
-	if (GRAPHIC->WINDOW_STYLE.TRANSPARENCY)
+	if (GRAPHIC->WINDOW.TRANSPARENCY)
 	{
 		BITMAPINFO		BITMAP_HEADER;
 		void			*BITMAP_DATA;
 		POINT			POINT_SOURCE = {0, 0};
-		SIZE			WINDOW_SIZE = {GRAPHIC->WIDTH, GRAPHIC->HEIGHT};
+		SIZE			WINDOW_SIZE = {GRAPHIC->WIDTH, GRAPHIC->WINDOW.HEIGHT};
 		BLENDFUNCTION	BLEND = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
 
 		BITMAP_HEADER.bmiHeader.biSize = (DWORD)sizeof(BITMAPINFOHEADER);
-		BITMAP_HEADER.bmiHeader.biWidth = (LONG)GRAPHIC->WIDTH;
-		BITMAP_HEADER.bmiHeader.biHeight = (LONG)-(GRAPHIC->HEIGHT);
+		BITMAP_HEADER.bmiHeader.biWidth = (LONG)GRAPHIC->WINDOW.WIDTH;
+		BITMAP_HEADER.bmiHeader.biHeight = (LONG)-(GRAPHIC->WINDOW.HEIGHT);
 		BITMAP_HEADER.bmiHeader.biPlanes = (WORD)1;
 		BITMAP_HEADER.bmiHeader.biBitCount = (WORD)32;
 		BITMAP_HEADER.bmiHeader.biCompression = (DWORD)BI_RGB;
@@ -314,7 +341,7 @@ extern void
 		memcpy(
 			BITMAP_DATA,
 			GRAPHIC->BUFFER,
-			GRAPHIC->WIDTH * GRAPHIC->HEIGHT * 4
+			GRAPHIC->WIDTH * GRAPHIC->HEIGHT * sizeof(unsigned int)
 		);
 		HANDLE_OLD_BITMAP = SelectObject(
 			MEMORY_DEVICE_CONTEXT,
@@ -341,8 +368,8 @@ extern void
 		BINFO	BITMAP_INFO;
 
 		BITMAP_INFO.BITMAP_HEADER.biSize = (DWORD)sizeof(BITMAP_INFO);
-		BITMAP_INFO.BITMAP_HEADER.biWidth = (LONG)GRAPHIC->WIDTH;
-		BITMAP_INFO.BITMAP_HEADER.biHeight = (LONG)-(GRAPHIC->HEIGHT);
+		BITMAP_INFO.BITMAP_HEADER.biWidth = (LONG)GRAPHIC->WINDOW.WIDTH;
+		BITMAP_INFO.BITMAP_HEADER.biHeight = (LONG)-(GRAPHIC->WINDOW.HEIGHT);
 		BITMAP_INFO.BITMAP_HEADER.biPlanes = (WORD)1;
 		BITMAP_INFO.BITMAP_HEADER.biBitCount = (WORD)32;
 		BITMAP_INFO.BITMAP_HEADER.biCompression = (DWORD)BI_BITFIELDS;
@@ -371,20 +398,22 @@ extern void
 			0,
 			0,
 			0,
-			GRAPHIC->HEIGHT,
+			GRAPHIC->WINDOW.HEIGHT,
 			GRAPHIC->BUFFER,
 			(BITMAPINFO *)&BITMAP_INFO,
 			DIB_RGB_COLORS
 		);
-		BitBlt(
+		StretchBlt(
 			HANDLE_DEVICE_CONTEXT,
+			0,
+			0,
+			GRAPHIC->WINDOW.WIDTH,
+			GRAPHIC->WINDOW.HEIGHT,
+			MEMORY_DEVICE_CONTEXT,
 			0,
 			0,
 			GRAPHIC->WIDTH,
 			GRAPHIC->HEIGHT,
-			MEMORY_DEVICE_CONTEXT,
-			0,
-			0,
 			SRCCOPY
 		);
 		SelectObject(MEMORY_DEVICE_CONTEXT, HANDLE_OLD_BITMAP);
@@ -413,6 +442,75 @@ static LRESULT CALLBACK
 
 	switch (MSG)
 	{ // "switch case" is speed! Wrom wrommmm!!!
+		case (WM_TIMER):
+		{
+			if (GRAPHIC->WINDOW.TRANSPARENCY)
+				REFRESH_SCREEN(GRAPHIC);
+			else
+				InvalidateRect(WINDOW_HANDLE, ((void *)0), 1);
+
+			UpdateWindow(WINDOW_HANDLE);
+
+			if (GRAPHIC->WINDOW.TRANSPARENCY)
+			{
+				if (!GRAPHIC->WINDOW_RESIZING)
+					GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
+			}
+			else
+				GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
+
+			if (!GRAPHIC->WINDOW_HANDLE)
+				PostQuitMessage(0);
+
+			break ;
+		}
+		case (WM_ENTERSIZEMOVE):
+		{
+			GRAPHIC->WINDOW_RESIZING = 1;
+			break ;
+		}
+		case (WM_EXITSIZEMOVE):
+		{
+			GRAPHIC->WINDOW_RESIZING = 0;
+			break ;
+		}
+		case (WM_SIZE):
+		{
+			if (W_PARAM != SIZE_MINIMIZED)
+			{
+				GRAPHIC->WINDOW.WIDTH = LOWORD(L_PARAM);
+				GRAPHIC->WINDOW.HEIGHT = HIWORD(L_PARAM);
+				GRAPHIC->WIDTH = GRAPHIC->WINDOW.WIDTH;
+				GRAPHIC->HEIGHT = GRAPHIC->WINDOW.HEIGHT;
+
+				free(GRAPHIC->BUFFER);
+
+				GRAPHIC->BUFFER = (unsigned int *)malloc(
+					sizeof(unsigned int) *
+					(GRAPHIC->WIDTH * GRAPHIC->HEIGHT + 1)
+				);
+
+				if (!GRAPHIC->BUFFER)
+				{
+					WINDOW_CLOSE(GRAPHIC);
+					return (1);
+				}
+
+				GRAPHIC->FUNCTION_RESIZE(GRAPHIC->FUNCTION_RESIZE_ARG);
+
+				if (GRAPHIC->WINDOW.TRANSPARENCY)
+				{
+					GRAPHIC->FUNCTION_LOOP(GRAPHIC->FUNCTION_LOOP_ARG);
+					REFRESH_SCREEN(GRAPHIC);
+				}
+				else
+					InvalidateRect(WINDOW_HANDLE, ((void *)0), 1);
+
+				UpdateWindow(WINDOW_HANDLE);
+			}
+
+			break ;
+		}
 		case (WM_DESTROY): // 0X0002
 		{
 			PostQuitMessage(0);
@@ -426,18 +524,22 @@ static LRESULT CALLBACK
 			HBITMAP		HANDLE_BITMAP;
 			HBITMAP		HANDLE_OLD_BITMAP;
 
-			if (GRAPHIC->WINDOW_STYLE.TRANSPARENCY)
+			if (GRAPHIC->WINDOW.TRANSPARENCY)
 			{
 				BITMAPINFO		BITMAP_HEADER;
 				void			*BITMAP_DATA;
 				POINT			POINT_SOURCE = {0, 0};
-				SIZE			WINDOW_SIZE = {GRAPHIC->WIDTH, GRAPHIC->HEIGHT};
+				SIZE			WINDOW_SIZE = {
+					GRAPHIC->WINDOW.WIDTH,
+					GRAPHIC->WINDOW.HEIGHT
+				};
 				BLENDFUNCTION	BLEND = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
 
 				BITMAP_HEADER.bmiHeader.biSize =
 					(DWORD)sizeof(BITMAPINFOHEADER);
-				BITMAP_HEADER.bmiHeader.biWidth = (LONG)GRAPHIC->WIDTH;
-				BITMAP_HEADER.bmiHeader.biHeight = (LONG)-(GRAPHIC->HEIGHT);
+				BITMAP_HEADER.bmiHeader.biWidth = (LONG)GRAPHIC->WINDOW.WIDTH;
+				BITMAP_HEADER.bmiHeader.biHeight =
+					(LONG)-(GRAPHIC->WINDOW.HEIGHT);
 				BITMAP_HEADER.bmiHeader.biPlanes = (WORD)1;
 				BITMAP_HEADER.bmiHeader.biBitCount = (WORD)32;
 				BITMAP_HEADER.bmiHeader.biCompression = (DWORD)BI_RGB;
@@ -459,7 +561,7 @@ static LRESULT CALLBACK
 				memcpy(
 					BITMAP_DATA,
 					GRAPHIC->BUFFER,
-					GRAPHIC->WIDTH * GRAPHIC->HEIGHT * 4
+					GRAPHIC->WIDTH * GRAPHIC->HEIGHT * sizeof(unsigned int)
 				);
 				HANDLE_OLD_BITMAP = SelectObject(
 					MEMORY_DEVICE_CONTEXT,
@@ -486,8 +588,9 @@ static LRESULT CALLBACK
 				BINFO	BITMAP_INFO;
 
 				BITMAP_INFO.BITMAP_HEADER.biSize = (DWORD)sizeof(BITMAP_INFO);
-				BITMAP_INFO.BITMAP_HEADER.biWidth = (LONG)GRAPHIC->WIDTH;
-				BITMAP_INFO.BITMAP_HEADER.biHeight = (LONG)-(GRAPHIC->HEIGHT);
+				BITMAP_INFO.BITMAP_HEADER.biWidth = (LONG)GRAPHIC->WINDOW.WIDTH;
+				BITMAP_INFO.BITMAP_HEADER.biHeight =
+					(LONG)-(GRAPHIC->WINDOW.HEIGHT);
 				BITMAP_INFO.BITMAP_HEADER.biPlanes = (WORD)1;
 				BITMAP_INFO.BITMAP_HEADER.biBitCount = (WORD)32;
 				BITMAP_INFO.BITMAP_HEADER.biCompression = (DWORD)BI_BITFIELDS;
@@ -515,20 +618,22 @@ static LRESULT CALLBACK
 					0,
 					0,
 					0,
-					GRAPHIC->HEIGHT,
+					GRAPHIC->WINDOW.HEIGHT,
 					GRAPHIC->BUFFER,
 					(BITMAPINFO *)&BITMAP_INFO,
 					DIB_RGB_COLORS
 				);
-				BitBlt(
+				StretchBlt(
 					HANDLE_DEVICE_CONTEXT,
+					0,
+					0,
+					GRAPHIC->WINDOW.WIDTH,
+					GRAPHIC->WINDOW.HEIGHT,
+					MEMORY_DEVICE_CONTEXT,
 					0,
 					0,
 					GRAPHIC->WIDTH,
 					GRAPHIC->HEIGHT,
-					MEMORY_DEVICE_CONTEXT,
-					0,
-					0,
 					SRCCOPY
 				);
 				SelectObject(MEMORY_DEVICE_CONTEXT, HANDLE_OLD_BITMAP);
@@ -544,17 +649,8 @@ static LRESULT CALLBACK
 			if (!!GRAPHIC->FUNCTION_CLOSE)
 				GRAPHIC->FUNCTION_CLOSE(GRAPHIC->FUNCTION_CLOSE_ARG);
 			else
-			{
-				if (!!GRAPHIC->BUFFER)
-				{
-					free(GRAPHIC->BUFFER);
-					GRAPHIC->BUFFER = ((void *)0);
-				}
+				WINDOW_CLOSE(GRAPHIC);
 
-				DestroyWindow(WINDOW_HANDLE);
-			}
-
-			GRAPHIC = ((void *)0);
 			break ;
 		}
 		case (WM_KEYDOWN): // 0X0100
@@ -1162,6 +1258,14 @@ static LRESULT CALLBACK
 			break ;
 		}
 	}
+
+	return (0);
+}
+
+int
+	IDLE_FUNCTION(void *ARG)
+{
+	IGNORE	ARG;
 
 	return (0);
 }

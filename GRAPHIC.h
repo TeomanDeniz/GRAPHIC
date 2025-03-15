@@ -242,6 +242,17 @@ extern void	event_hook_mouse(
 	int (*f)(unsigned int, unsigned int, unsigned char, void *),
 	void *arg
 );
+
+extern void	EVENT_HOOK_RESIZE(
+	struct GRAPHIC *const GRAPHIC,
+	int (*F)(void *),
+	void *ARG
+);
+extern void	event_hook_resize(
+	struct graphic *const graphic,
+	int (*f)(void *),
+	void *arg
+);
 /* ************************** [^] EVENT HOOKS [^] *************************** */
 
 #	else /* !__STDC__ */

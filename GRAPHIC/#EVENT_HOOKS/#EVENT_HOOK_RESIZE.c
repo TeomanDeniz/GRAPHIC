@@ -1,56 +1,60 @@
 /******************************************************************************\
-# H - GRAPHIC/#FUNCIONS/#GRAPHIC_LOOP_WINDOWS    #       Maximum Tension       #
+# H - GRAPHIC/#EVENT_HOOKS/#RESIZE               #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
 # maximum-tension.com                            #  ::                      :: #
 #                                                #  :!:    : :: : :  :  ::::!: #
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
-# : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
+# : C - Maximum Tension :: Create - 2024/05/23 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
 # : License - APACHE 2  :: Update - 2025/03/13 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../../#STRUCT.h" /*
-#	 struct GRAPHIC;
-#	        */
-#	include <winuser.h> /*
-#	 define GetMessage(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax)
-#	 define WM_QUIT
-#	 define DispatchMessage(lpMsg)
-#	typedef MSG;
-#	   BOOL TranslateMessage(MSG *);
-#	   uint *SetTimer(HWND, UINT_PTR, UINT, TIMERPROC);
-#	        */
+#include "../#STRUCT.h" /*
+# struct GRAPHIC;
+# struct graphic;
+#        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
-int
-	GRAPHIC_LOOP(struct GRAPHIC *GRAPHIC)
+#ifdef __STDC__ /* STANDARD C */
+void
+	EVENT_HOOK_RESIZE(
+	struct GRAPHIC *const GRAPHIC,
+	int (*F)(void *),
+	void *ARG
+)
+#else /* K&R */
+void
+	EVENT_HOOK_RESIZE(GRAPHIC, F, ARG)
+	struct GRAPHIC	*GRAPHIC;
+	int	(*F)(void *);
+	void			*ARG;
+#endif /* __STDC__ */
 {
-	MSG	EVENT_MSG = {0};
-
-	SetTimer(
-		GRAPHIC->WINDOW_HANDLE,
-		1,
-		(UINT)((1.0 / (double)GRAPHIC->FPS) * 1000),
-		((void *)0)
-	);
-
-	while (GetMessage(&EVENT_MSG, ((void *)0), 0, 0))
-	{
-		if (EVENT_MSG.message == WM_QUIT)
-			return (1);
-
-		TranslateMessage(&EVENT_MSG);
-		DispatchMessage(&EVENT_MSG);
-	}
-
-	return (0);
+	GRAPHIC->FUNCTION_RESIZE = F;
+	GRAPHIC->FUNCTION_RESIZE_ARG = ARG;
 }
 
-#else
-#	error "Please do not include this header directly!"
-#endif /* GRAPHIC_FUNCTIONS__GRAPHIC_LOOP_C */
+/* ***************************** [V] LOWERCASE [V] ************************** */
+#ifdef __STDC__ /* STANDARD C */
+void
+	event_hook_resize(
+	struct graphic *const graphic,
+	int (*f)(void *),
+	void *arg
+)
+#else /* K&R */
+void
+	event_hook_resize(graphic, f, arg)
+	struct graphic	*graphic;
+	int	(*f)(void *);
+	void			*arg;
+#endif /* __STDC__ */
+{
+	graphic->FUNCTION_RESIZE = f;
+	graphic->FUNCTION_RESIZE_ARG = arg;
+}
+/* ***************************** [^] LOWERCASE [^] ************************** */

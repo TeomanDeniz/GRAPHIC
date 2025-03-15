@@ -87,7 +87,7 @@ int
 		CURRENT_TITLE[TITLE_SIZE] = 0;
 	}
 
-	GRAPHIC->TITLE = CURRENT_TITLE;
+	GRAPHIC->WINDOW.TITLE = CURRENT_TITLE;
 
 	if (!!GRAPHIC->WINDOW_MODULE)
 	{
@@ -95,7 +95,7 @@ int
 			REFRESH_SCREEN("NSString"),
 			"stringWithUTF8String:",
 			char *,
-			GRAPHIC->TITLE
+			GRAPHIC->WINDOW.TITLE
 		);
 		MSG1(void, GRAPHIC->WINDOW_MODULE, "setTitle:", id, TITLE_ID);
 	}
