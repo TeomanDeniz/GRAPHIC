@@ -6,7 +6,7 @@ A cross-platform graphics library written in C and designed for use in C project
 Pull with:
 
 ```sh
-git clone --recurse-submodules "git@github.com:TeomanDeniz/GRAPHIC.git"
+git clone --recurse-submodules "git@github.com:TeomanDeniz/LIBCGFX.git"
 ```
 
 Or if you're downloading manually, please also download the latest version of [LIBCMT](https://github.com/TeomanDeniz/LIBCMT) and put it inside your project folder with `LIBCMT` name. (`./<THIS REPO>/LIBCMT`)
