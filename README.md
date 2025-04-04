@@ -1,5 +1,5 @@
 # LibCGFX (C Graphics Library)
-A cross platform graphic library created with C language that you can use in C language.
+A cross-platform graphics library written in C and designed for use in C projects.
 
 ## Installation to your project
 
