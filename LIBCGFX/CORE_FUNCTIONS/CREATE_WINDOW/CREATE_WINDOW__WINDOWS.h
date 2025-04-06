@@ -9,7 +9,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -700,11 +700,13 @@ static LRESULT CALLBACK
 				case (17):
 				{
 					APP->KEY.CTRL = !((L_PARAM >> 31) & 1);
+					APP->KEY.CONTROL = APP->KEY.CTRL;
 					break ;
 				}
 				case (18):
 				{
 					APP->KEY.ALT = !((L_PARAM >> 31) & 1);
+					APP->KEY.OPTION = APP->KEY.ALT;
 					break ;
 				}
 				case (19):
@@ -725,7 +727,7 @@ static LRESULT CALLBACK
 				case (32):
 				{
 					APP->KEY.SPACEBAR = !((L_PARAM >> 31) & 1);
-					APP->KEY.SPACE = !((L_PARAM >> 31) & 1);
+					APP->KEY.SPACE = APP->KEY.SPACEBAR;
 					break ;
 				}
 				case (33):
@@ -969,9 +971,15 @@ static LRESULT CALLBACK
 					break ;
 				}
 				case (91):
+				{
+					APP->KEY.WIN = !((L_PARAM >> 31) & 1);
+					APP->KEY.COMMAND = APP->KEY.WIN;
+					break ;
+				}
 				case (92):
 				{
 					APP->KEY.WIN = !((L_PARAM >> 31) & 1);
+					APP->KEY.COMMAND = APP->KEY.WIN;
 					break ;
 				}
 				case (112):

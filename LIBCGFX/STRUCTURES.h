@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/04/26 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -178,9 +178,9 @@ struct	S_KEY // IT'S ONLY 14 BYTES LOL ;-)
 	/* [^] COMMAND KEYS (WINDOWS) ------------------------------------------- */
 
 	/* [v] COMMAND KEYS (MACOS) --------------------------------------------- */
-	unsigned char	CONTROL : 1; // MACOS
-	unsigned char	COMMAND : 1; // MACOS
-	unsigned char	OPTION : 7; // MACOS
+	unsigned char	CONTROL : 1; // MACOS (CTRL)
+	unsigned char	COMMAND : 1; // MACOS (WIN)
+	unsigned char	OPTION : 7; // MACOS (ALT)
 	/* [^] COMMAND KEYS (MACOS) --------------------------------------------- */
 	unsigned char	DOWN; // Last key down
 	unsigned char	UP; // Last key up

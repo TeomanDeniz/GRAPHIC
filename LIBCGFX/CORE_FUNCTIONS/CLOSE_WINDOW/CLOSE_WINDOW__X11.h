@@ -56,12 +56,7 @@ void
 	{
 		XDestroyImage(APP->IMAGE);
 		APP->IMAGE = ((void *)0);
-	}
-
-	if (!!APP->BUFFER)
-	{
-		free(APP->BUFFER);
-		APP->BUFFER = ((void *)0);
+		APP->BUFFER = ((void *)0); // YES, XDestroyImage FREES THE BUFFER..
 	}
 }
 

@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/05 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -29,10 +29,7 @@
 #		ifdef __DJGPP__
 #			include "APP_TIME__MSDOS.h"
 #		else /* UNIX (PROBABLY) */
-#			if (defined(__linux__) || defined(__gnu_linux__) || \
-				defined(__FreeBSD__) || defined(__NetBSD__) || \
-				defined(__OpenBSD__) || defined(__DragonFly__) || \
-				defined(__sun) || defined(X11))
+#			if (defined(__linux__) || defined(__unix__))
 #				include "APP_TIME__UNIX.h"
 #			endif /* UNIX */
 #		endif /* __DJGPP__ */

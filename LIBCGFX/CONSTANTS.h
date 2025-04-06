@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -20,7 +20,9 @@
 #	define KEY_ENTER 10
 #	define KEY_SHIFT 16
 #	define KEY_CTRL 17
+#	define KEY_CONTROL 17
 #	define KEY_ALT 18
+#	define KEY_OPTION 18
 #	define KEY_PAUSE 19
 #	define KEY_CAPSLOCK 20
 #	define KEY_ESC 27
@@ -80,6 +82,7 @@
 #	define KEY_Y 89
 #	define KEY_Z 90
 #	define KEY_WIN 91 // OR 92
+#	define KEY_COMMAND 91 // OR 92
 #	define KEY_F1 112
 #	define KEY_F2 113
 #	define KEY_F3 114

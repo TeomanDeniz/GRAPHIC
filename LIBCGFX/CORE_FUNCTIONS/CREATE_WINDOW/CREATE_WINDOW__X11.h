@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -165,7 +165,6 @@ int
 		X_WINDOW_ATTRIBUTES.override_redirect = 1;
 	}
 
-	XSetWMNormalHints(APP->DISPLAY, APP->XWINDOW, &SIZE_HINTS);
 	APP->XWINDOW = XCreateWindow(
 		APP->DISPLAY,
 		RootWindow(APP->DISPLAY, SCREEN),
@@ -187,6 +186,7 @@ int
 		return (-4);
 	}
 
+	XSetWMNormalHints(APP->DISPLAY, APP->XWINDOW, &SIZE_HINTS);
 	APP->GRAPHICS_CONTEXT = XCreateGC(
 		APP->DISPLAY,
 		APP->XWINDOW,
@@ -271,16 +271,6 @@ int
 		);
 	}
 
-	if (APP->WINDOW.FOCUSABLE)
-	{
-		XSetInputFocus(
-			APP->DISPLAY,
-			APP->XWINDOW,
-			RevertToParent,
-			CurrentTime
-		);
-	}
-
 	if (!APP->WINDOW.HIDEONCREATE)
 		XMapWindow(APP->DISPLAY, APP->XWINDOW);
 
@@ -303,6 +293,18 @@ int
 		CLOSE_WINDOW(APP);
 		return (-6);
 	}
+
+	/*
+	if (APP->WINDOW.FOCUSABLE)
+	{
+		XSetInputFocus(
+			APP->DISPLAY,
+			APP->XWINDOW,
+			RevertToParent,
+			CurrentTime
+		);
+	}
+	*/
 
 	return (0);
 }

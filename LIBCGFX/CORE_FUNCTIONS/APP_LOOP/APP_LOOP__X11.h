@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -31,6 +31,7 @@
 #	include <X11/XKBlib.h> /*
 #	 KeySym XkbKeycodeToKeysym(Display *, [kc], int, int);
 #	        */
+#	include <X11/keysym.h> /* [>] <X11/keysymdef.h>	 */
 #	include <X11/keysymdef.h> /*
 #	 define XK_BackSpace   #	 define XK_Delete
 #	 define XK_Down        #	 define XK_End
@@ -69,6 +70,14 @@
 #	include <stdlib.h> /*
 #	   void free(void *);
 #	        */
+#	include <unistd.h> /*
+#	    int usleep(useconds_t);
+#	        */
+#	include <time.h> /*
+#	 define CLOCK_MONOTONIC
+#	 struct timespec;
+#	    int clock_gettime(clockid_t, struct timespec *);
+#	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
 /* ***************************** [v] MACROS [v] ***************************** */
@@ -87,24 +96,52 @@ static int	__APP_LOOP__(struct S_APP *const APP);
 int
 	APP_LOOP(struct S_APP *APP)
 {
+	int	RESULT;
+	int	FRAME_TIME_LIMITER;
+
+	RESULT = 0;
+
+	if (APP-> FPS > 0)
+		FRAME_TIME_LIMITER = (1000000 / APP->FPS);
+	else
+		FRAME_TIME_LIMITER = 0;
+
 	if (!!APP->FUNCTION_LOOP)
 	{
-		while (!__APP_LOOP__(APP))
-			APP->FUNCTION_LOOP(APP->FUNCTION_LOOP_ARG);
+		while (!__APP_LOOP__(APP) && !RESULT)
+		{
+			struct timespec	START_TIMER;
+			struct timespec	END_TIMER;
+			register long	ELAPSED;
+
+			clock_gettime(CLOCK_MONOTONIC, &START_TIMER);
+			RESULT = APP->FUNCTION_LOOP(APP->FUNCTION_LOOP_ARG);
+			clock_gettime(CLOCK_MONOTONIC, &END_TIMER);
+			ELAPSED = (
+				(END_TIMER.tv_sec - START_TIMER.tv_sec) * 1000000L + 
+				(END_TIMER.tv_nsec - START_TIMER.tv_nsec) / 1000
+			);
+
+			if (ELAPSED < FRAME_TIME_LIMITER)
+				usleep(FRAME_TIME_LIMITER - ELAPSED);
+		}
 	}
 	else
 	{
 		while (!__APP_LOOP__(APP))
-			(void)0;
+			usleep(FRAME_TIME_LIMITER);
 	}
 
-	return (0);
+	return (RESULT);
 }
 
 static int
 	__APP_LOOP__(struct S_APP *const APP)
 {
 	XEvent	EVENT;
+
+	if (!APP->DISPLAY || !APP->XWINDOW || !APP->IMAGE)
+		return (1);
 
 	XPutImage(
 		APP->DISPLAY,
@@ -254,20 +291,14 @@ static int
 		}
 		else if (EVENT.type == KeyPress || EVENT.type == KeyRelease)
 		{
-			register int	KEY_MODE;
 			register int	KEY;
 
-			KEY_MODE = EVENT.xkey.state;
 			KEY = XkbKeycodeToKeysym(
 				APP->DISPLAY,
 				EVENT.xkey.keycode,
 				0,
 				0
 			);
-			APP->KEY.CTRL = !!(KEY_MODE & ControlMask);
-			APP->KEY.SHIFT = !!(KEY_MODE & ShiftMask);
-			APP->KEY.ALT = !!(KEY_MODE & Mod1Mask);
-			APP->KEY.COMMAND = !!(KEY_MODE & Mod4Mask);
 
 			switch (KEY) // "switch case" is speed! Wrom wrommmm!!!
 			{ // https://www.cl.cam.ac.uk/~mgk25/ucs/keysymdef.h
@@ -984,6 +1015,124 @@ static int
 						APP->KEY.DOWN = 245;
 					else
 						APP->KEY.UP = 245;
+
+					break ;
+				}
+				case (XK_Shift_L):
+				{
+					APP->KEY.SHIFT = (EVENT.type == KeyPress);
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 16;
+					else
+						APP->KEY.UP = 16;
+
+					break ;
+				}
+				case (XK_Shift_R):
+				{
+					APP->KEY.SHIFT = (EVENT.type == KeyPress);
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 16;
+					else
+						APP->KEY.UP = 16;
+
+					break ;
+				}
+				case (XK_Control_L):
+				{
+					APP->KEY.CONTROL = (EVENT.type == KeyPress);
+					APP->KEY.CTRL = APP->KEY.CONTROL;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 17;
+					else
+						APP->KEY.UP = 17;
+
+					break ;
+				}
+				case (XK_Control_R):
+				{
+					APP->KEY.CONTROL = (EVENT.type == KeyPress);
+					APP->KEY.CTRL = APP->KEY.CONTROL;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 17;
+					else
+						APP->KEY.UP = 17;
+
+					break ;
+				}
+				case (XK_Alt_L):
+				{
+					APP->KEY.OPTION = (EVENT.type == KeyPress);
+					APP->KEY.ALT = APP->KEY.OPTION;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 18;
+					else
+						APP->KEY.UP = 18;
+
+					break ;
+				}
+				case (XK_Alt_R):
+				{
+					APP->KEY.OPTION = (EVENT.type == KeyPress);
+					APP->KEY.ALT = APP->KEY.OPTION;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 18;
+					else
+						APP->KEY.UP = 18;
+
+					break ;
+				}
+				case (XK_Meta_L):
+				{
+					APP->KEY.OPTION = (EVENT.type == KeyPress);
+					APP->KEY.ALT = APP->KEY.OPTION;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 18;
+					else
+						APP->KEY.UP = 18;
+
+					break ;
+				}
+				case (XK_Meta_R):
+				{
+					APP->KEY.OPTION = (EVENT.type == KeyPress);
+					APP->KEY.ALT = APP->KEY.OPTION;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 18;
+					else
+						APP->KEY.UP = 18;
+
+					break ;
+				}
+				case (XK_Super_L):
+				{
+					APP->KEY.COMMAND = (EVENT.type == KeyPress);
+					APP->KEY.WIN = APP->KEY.COMMAND;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 91;
+					else
+						APP->KEY.UP = 91;
+
+					break ;
+				}
+				case (XK_Super_R):
+				{
+					APP->KEY.COMMAND = (EVENT.type == KeyPress);
+					APP->KEY.WIN = APP->KEY.COMMAND;
+
+					if (EVENT.type == KeyPress)
+						APP->KEY.DOWN = 91;
+					else
+						APP->KEY.UP = 91;
 
 					break ;
 				}

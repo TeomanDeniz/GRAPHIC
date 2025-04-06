@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/05 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -55,8 +55,13 @@ int
 	}
 
 	APP->WINDOW.TITLE = CURRENT_TITLE;
-	XStoreName(APP->DISPLAY, APP->XWINDOW, APP->WINDOW.TITLE);
-	XSync(APP->DISPLAY, APP->XWINDOW);
+
+	if (APP->DISPLAY && APP->XWINDOW)
+	{
+		XStoreName(APP->DISPLAY, APP->XWINDOW, APP->WINDOW.TITLE);
+		XSync(APP->DISPLAY, APP->XWINDOW);
+	}
+
 	return (0);
 }
 #else
