@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/04/09 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -120,7 +120,7 @@ int
 	APP->WINDOW.WIDTH = WIDTH;
 	APP->WINDOW.HEIGHT = HEIGHT;
 	APP->DISPLAY = XOpenDisplay(NULL);
-	SIZE_HINTS.flags = PMinSize | PMaxSize;
+	SIZE_HINTS.flags = 0;
 
 	if (!APP->DISPLAY)
 	{
@@ -153,6 +153,7 @@ int
 
 	if (!APP->WINDOW.RESIZABLE)
 	{
+		SIZE_HINTS.flags |= PMinSize | PMaxSize;
 		SIZE_HINTS.min_width = APP->WINDOW.WIDTH;
 		SIZE_HINTS.max_width = APP->WINDOW.WIDTH;
 		SIZE_HINTS.min_height = APP->WINDOW.HEIGHT;
