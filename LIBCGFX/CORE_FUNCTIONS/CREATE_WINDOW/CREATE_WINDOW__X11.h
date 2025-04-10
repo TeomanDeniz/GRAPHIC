@@ -84,10 +84,13 @@ extern void	*memset(void *, int, size_t);
 /* *************************** [^] PROTOTYPES [^] *************************** */
 
 /* ***************************** [v] UNIONS [v] ***************************** */
-union U_ATOM_TO_UCHAR__CONVERT
+struct S_WINDOW_HINTS
 {
-	Atom			*ATOM;
-	unsigned char	*BYTE;
+	unsigned long	FLAGS;
+	unsigned long	FUNCTIONS;
+	unsigned long	DECORATIONS;
+	long			INPUT_MODE;
+	unsigned long	STATUS;
 };
 /* ***************************** [^] UNIONS [^] ***************************** */
 
@@ -227,48 +230,24 @@ int
 	WM_DELETE = XInternAtom(APP->DISPLAY, "WM_DELETE_WINDOW", 0);
 	XSetWMProtocols(APP->DISPLAY, APP->XWINDOW, &WM_DELETE, 1);
 
-	if (APP->WINDOW.MINIMIZABLE)
-		XIconifyWindow(APP->DISPLAY, APP->XWINDOW, SCREEN);
-
-	if (APP->WINDOW.MAXIMIZABLE)
+	if (!APP->WINDOW.MAXIMIZABLE || !APP->WINDOW.MINIMIZABLE)
 	{
-		union U_ATOM_TO_UCHAR__CONVERT	CONVERT;
-		Atom							NET_WM_STATE;
-		Atom							NET_WM_STATE_MAXIMIZED_HORZ;
-		Atom							NET_WM_STATE_MAXIMIZED_VERT;
+		struct S_WINDOW_HINTS	HINTS;
+		Atom					PROP;
 
-		NET_WM_STATE = XInternAtom(APP->DISPLAY, "_NET_WM_STATE", 0);
-		NET_WM_STATE_MAXIMIZED_HORZ = XInternAtom(
-			APP->DISPLAY,
-			"_NET_WM_STATE_MAXIMIZED_HORZ",
-			0
-		);
-		NET_WM_STATE_MAXIMIZED_VERT = XInternAtom(
-			APP->DISPLAY,
-			"_NET_WM_STATE_MAXIMIZED_VERT",
-			0
-		);
-		CONVERT.ATOM = &NET_WM_STATE_MAXIMIZED_HORZ;
+		HINTS.FLAGS = 0X01;
+		HINTS.FUNCTIONS = 0X04 | 0X08 | 0X20;
+
+		PROP = XInternAtom(APP->DISPLAY, "_MOTIF_WM_HINTS", 0);
 		XChangeProperty(
 			APP->DISPLAY,
 			APP->XWINDOW,
-			NET_WM_STATE,
-			XA_ATOM,
+			PROP,
+			PROP,
 			32,
 			PropModeReplace,
-			CONVERT.BYTE,
-			1
-		);
-		CONVERT.ATOM = &NET_WM_STATE_MAXIMIZED_VERT;
-		XChangeProperty(
-			APP->DISPLAY,
-			APP->XWINDOW,
-			NET_WM_STATE,
-			XA_ATOM,
-			32,
-			PropModeReplace,
-			CONVERT.BYTE,
-			1
+			(unsigned char *)&HINTS,
+			5
 		);
 	}
 
@@ -306,6 +285,8 @@ int
 		);
 	}
 	*/
+
+	XMoveWindow(APP->DISPLAY, APP->XWINDOW, 100, 100);
 
 	return (0);
 }

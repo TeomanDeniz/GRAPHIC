@@ -291,6 +291,8 @@ int
 	app_setup(&app);
 	app.fps = 80;
 	app.window.resizable = 1;
+	app.window.transparency = 0;
+	app.window.maximizable = 1;
 
 	example_3d_map[2][2][2].color = 0xFF0000; // Red voxel
 	example_3d_map[3][2][2].color = 0x00FF00; // Green voxel
@@ -308,7 +310,7 @@ int
 	camera_radiant_x = 0.7;
 	camera_radiant_y = -0.25;
 
-	create_window(&app, 600, 600);
+	create_window(&app, 1600, 1600);
 	event_hook_loop(&app, loop, (void *)&app);
 	app_loop(&app);
 	return (0);
