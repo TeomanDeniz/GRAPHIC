@@ -1,0 +1,57 @@
+/******************************************************************************\
+# C - SET_CURSOR                                 #       Maximum Tension       #
+################################################################################
+#                                                #      -__            __-     #
+# Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
+# maximum-tension.com                            #  ::                      :: #
+#                                                #  :!:    : :: : :  :  ::::!: #
+# +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
+# : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
+# :---------------------::---------------------: #   :!1!!11000000000011!!:    #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
+# +.....................++.....................+ #       ::::!::!:::!::::      #
+\******************************************************************************/
+
+/* **************************** [v] INCLUDES [v] **************************** */
+#include "../../STRUCTURES.h" /*
+# struct s_app;
+# struct S_APP;
+#        */
+#include "../../../LIBCMT/ENVIRONMENTS/KNR_STYLE.h" /*
+# define KNR_STYLE
+#        */
+/* **************************** [^] INCLUDES [^] **************************** */
+
+#define LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_SET_CURSOR_C /* SEALER */
+
+#ifdef __APPLE__
+#	include "SET_CURSOR__MACOS.h"
+#else
+#	ifdef _WIN32
+#		include "SET_CURSOR__WINDOWS.h"
+#	else /* DOS */
+#		ifdef __DJGPP__
+#			include "SET_CURSOR__MSDOS.h"
+#		else /* UNIX (PROBABLY) */
+#			if (defined(__linux__) || defined(__unix__))
+#				include "SET_CURSOR__X11.h"
+#			endif /* UNIX */
+#		endif /* __DJGPP__ */
+#	endif /* _WIN32 */
+#endif /* __APPLE__ */
+				
+/* ***************************** [V] LOWERCASE [V] ************************** */
+#ifndef KNR_STYLE /* STANDARD C */
+void
+	set_cursor(struct s_app *const app, const unsigned char cursor_type)
+#else /* K&R */
+void
+	set_cursor(app, cursor_type)
+
+	struct s_app	*app;
+	char			cursor_type;
+#endif /* !KNR_STYLE */
+{
+	SET_CURSOR((struct S_APP *)app, cursor_type);
+}
+/* ***************************** [^] LOWERCASE [^] ************************** */

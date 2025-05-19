@@ -1,177 +1,221 @@
 
-#include "LIBCGFX.h"
+// Windows: gcc test_voxel.c LIBCGFX.a -lwinmm -lgdi32
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-
-// Windows: gcc test_voxel.c LIBCGFX.a -mwindows -lwinmm -lgdi32 -O3
-
-// MACOS: gcc test_voxel.c LIBCGFX.a -framework Cocoa -framework AudioToolbox
+// MACOS: gcc LIBCGFX.a test_voxel.c -framework Cocoa 	-framework AudioToolbox
 
 // MACOS_OPENGL: gcc LIBCGFX.a test_voxel.c -framework Cocoa -framework AudioToolbox -framework OpenGL
 
-// Unix: gcc test_voxel.c LIBCGFX.a -lX11 -lm -lasound
+// Unix: gcc LIBCGFX.a test_voxel.c -lX11 -lasound
 
-#define CUBE_SIZE     30
-#define MAP_SIZE      10
-#define PERSPECTIVE   0.698 // 40 degree
+#include "LIBCGFX.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-typedef struct
-{
-	int				visible;
-	unsigned int	color;
-} t_block;
+#define CUBE_SIZE    30
+#define MAP_SIZE     10
+#define PERSPECTIVE  0.698f // 40 degrees
 
-t_block example_3d_map[MAP_SIZE][MAP_SIZE][MAP_SIZE] = {0};
+#define MAX_VERTICES 8
+#define MAX_INDICES  36
 
-float camera_pos_x = 2.0f;
-float camera_pos_y = 2.0f;
-float camera_pos_z = 1.0f;
-float camera_radiant_x = 0.0f;
-float camera_radiant_y = 0.0f;
+#define TEXTURE 1
 
-void draw_line(struct s_app *app, int x1, int y1, int x2, int y2, unsigned int color)
-{
-	int dx, dy, sx, sy, err, e2;
 
-	dx = abs(x2 - x1);
-	dy = abs(y2 - y1);
-	sx = x1 < x2 ? 1 : -1;
-	sy = y1 < y2 ? 1 : -1;
-	err = (dx > dy ? dx : -dy) / 2;
 
-	while (1)
-	{
-		if (x1 >= 0 && y1 >= 0 && x1 < app->width && y1 < app->height)
-			put_pixel(app, x1, y1, color);
+unsigned int test_texture[24][24];
 
-		if (x1 == x2 && y1 == y2)
-			break;
-
-		e2 = err;
-		if (e2 > -dx)
-		{
-			err -= dy;
-			x1 += sx;
+void generate_test_texture() {
+	for (int y = 0; y < 24; ++y) {
+		for (int x = 0; x < 24; ++x) {
+			if ((x / 4 + y / 4) % 2 == 0)
+				test_texture[y][x] = 0xFF0000FFU; // Red (opaque)
+			else if ((x / 2 + y / 2) % 2 == 0)
+				test_texture[y][x] = 0x80FF00FFU; // Green (semi-transparent)
+			else
+				test_texture[y][x] = 0x00000000U; // Fully transparent
 		}
-		if (e2 < dy)
-		{
-			err += dx;
-			y1 += sy;
+	}
+
+	test_texture[0][0] = 0XFFFF0000U;
+	test_texture[23][23] = 0XFF00FF00U;
+	test_texture[0][23] = 0XFF00FFFFU;
+	test_texture[23][0] = 0XFFFFFF00U;
+}
+
+
+typedef struct {
+	float x, y, z;
+} vec3;
+
+typedef struct {
+	vec3 vertices[MAX_VERTICES];
+	int  indices[MAX_INDICES];
+	unsigned int color;
+} s_block_3d;
+
+float camera_pos_x = 7.534571f;
+float camera_pos_y = 86.0f;
+float camera_pos_z = 5.849144f;
+float camera_radiant_x = 0.7f;
+float camera_radiant_y = -0.25f;
+
+s_block_3d create_slab(float x, float y, float z, float size, unsigned int color) {
+	s_block_3d block;
+	block.color = color;
+
+	float s = size;
+	block.vertices[0] = (vec3){x,     y,     z};
+	block.vertices[1] = (vec3){x + s, y,     z};
+	block.vertices[2] = (vec3){x + s, y + s / 2, z};
+	block.vertices[3] = (vec3){x,     y + s / 2, z};
+	block.vertices[4] = (vec3){x,     y,     z + s};
+	block.vertices[5] = (vec3){x + s, y,     z + s};
+	block.vertices[6] = (vec3){x + s, y + s / 2, z + s};
+	block.vertices[7] = (vec3){x,     y + s / 2, z + s};
+
+	int indices[] = {
+		0,1,2, 2,3,0, // front
+		4,5,6, 6,7,4, // back
+		0,4,7, 7,3,0, // left
+		1,5,6, 6,2,1, // right
+		3,2,6, 6,7,3, // top
+		0,3,4, 5,6,1  // bottom
+	};
+	memcpy(block.indices, indices, sizeof(indices));
+
+	return block;
+}
+
+s_block_3d create_cube(float x, float y, float z, float size, unsigned int color) {
+	s_block_3d block;
+
+	float s = size;
+	block.color = color;
+
+	block.vertices[0] = (vec3){x,     y,     z};
+	block.vertices[1] = (vec3){x + s, y,     z};
+	block.vertices[2] = (vec3){x + s, y + s, z};
+	block.vertices[3] = (vec3){x,     y + s, z};
+	block.vertices[4] = (vec3){x,     y,     z + s};
+	block.vertices[5] = (vec3){x + s, y,     z + s};
+	block.vertices[6] = (vec3){x + s, y + s, z + s};
+	block.vertices[7] = (vec3){x,     y + s, z + s};
+
+	// indices forming 12 triangles (2 per face)
+	int cube_indices[] = {
+		0,1,2, 2,3,0, // front
+		4,5,6, 6,7,4, // back
+		0,4,7, 7,3,0, // left
+		1,5,6, 6,2,1, // right
+		3,2,6, 6,7,3, // top
+		0,3,4, 5,6,1  // bottom
+	};
+	/*
+	int cube_indices[] = {
+		0,1,2, 2,3,0,
+		1,5,6, 6,2,1,
+		0,0,0, 0,0,0,
+		0,0,0, 0,0,0,
+		0,0,0, 0,0,0,
+		0,0,0, 0,0,0
+	};
+	*/
+
+	memcpy(block.indices, cube_indices, sizeof(cube_indices));
+
+	return block;
+}
+
+
+
+
+
+// Helper: calculate edge function
+float edge_function(int x0, int y0, int x1, int y1, int x, int y)
+{
+	return (float)(x - x0) * (y1 - y0) - (y - y0) * (x1 - x0);
+}
+
+// Fill a textured triangle
+void fill_triangle_textured(struct s_app *app,
+	int x0, int y0, int x1, int y1, int x2, int y2,
+	int texture[24][24], int tex_width, int tex_height)
+{
+	int min_x = (x0 < x1 ? (x0 < x2 ? x0 : x2) : (x1 < x2 ? x1 : x2));
+	int min_y = (y0 < y1 ? (y0 < y2 ? y0 : y2) : (y1 < y2 ? y1 : y2));
+	int max_x = (x0 > x1 ? (x0 > x2 ? x0 : x2) : (x1 > x2 ? x1 : x2));
+	int max_y = (y0 > y1 ? (y0 > y2 ? y0 : y2) : (y1 > y2 ? y1 : y2));
+
+	float area = edge_function(x0, y0, x1, y1, x2, y2);
+	if (area == 0.0f)
+		return; // Degenerate triangle
+
+	for (int y = min_y; y <= max_y; ++y) {
+		for (int x = min_x; x <= max_x; ++x) {
+			float w0 = edge_function(x1, y1, x2, y2, x, y);
+			float w1 = edge_function(x2, y2, x0, y0, x, y);
+			float w2 = edge_function(x0, y0, x1, y1, x, y);
+
+			if (w0 >= 0 && w1 >= 0 && w2 >= 0) {
+				// Normalize barycentric coordinates
+				w0 /= area;
+				w1 /= area;
+				w2 /= area;
+
+				// Use barycentric coordinates for simple UV mapping
+				int u = (int)((w1 * 1.0f + w2 * 1.0f) * (tex_width - 1));
+				int v = (int)((w2 * 1.0f) * (tex_height - 1));
+
+				u = u < 0 ? 0 : (u >= tex_width ? tex_width - 1 : u);
+				v = v < 0 ? 0 : (v >= tex_height ? tex_height - 1 : v);
+
+				unsigned int color = texture[v][u];
+				if ((color & 0xFF000000U) != 0) // Only draw if not transparent
+					if (x >= 0 && y >= 0 && x < app->width && y < app->height)
+						put_pixel(app, x, y, color);
+			}
 		}
 	}
 }
 
-static float rfpart(float x) { return 1.0f - (x - floorf(x)); }
-static float fpart(float x)  { return x - floorf(x); }
 
-void put_pixel_blend(struct s_app *app, int x, int y, unsigned int color, float alpha)
-{
-	if (x < 0 || y < 0 || x >= app->width || y >= app->height || alpha <= 0.0f)
-		return ;
 
-	unsigned int dst = app->buffer[y * app->width + x];
+void draw_line(struct s_app *app, int x1, int y1, int x2, int y2, unsigned int color) {
+	int dx = abs(x2 - x1);
+	int dy = abs(y2 - y1);
+	int sx = x1 < x2 ? 1 : -1;
+	int sy = y1 < y2 ? 1 : -1;
+	int err = (dx > dy ? dx : -dy) / 2;
 
-	register unsigned char r = (unsigned char)(((dst >> 16) & 0XFF) * (1 - alpha) + ((color >> 16) & 0XFF) * alpha);
-	register unsigned char g = (unsigned char)(((dst >> 8) & 0XFF) * (1 - alpha) + ((color >> 8) & 0XFF) * alpha);
-	register unsigned char b = (unsigned char)((dst & 0XFF) * (1 - alpha) + (color & 0XFF) * alpha);
-
-	app->buffer[y * app->width + x] = (r << 16) | (g << 8) | b;
-}
-
-void draw_line_aa(struct s_app *app, float x0, float y0, float x1, float y1, unsigned int color)
-{
-	int steep = fabsf(y1 - y0) > fabsf(x1 - x0);
-	if (steep) {
-		float temp;
-		temp = x0; x0 = y0; y0 = temp;
-		temp = x1; x1 = y1; y1 = temp;
-	}
-
-	if (x0 > x1)
+	while (x1 < app->width && y1 < app->height && x1 >= 0 && y1 >= 0)
 	{
-		float temp;
-		temp = x0; x0 = x1; x1 = temp;
-		temp = y0; y0 = y1; y1 = temp;
-	}
+		put_pixel(app, x1, y1, color);
 
-	float dx = x1 - x0;
-	float dy = y1 - y0;
-	float gradient = dx == 0 ? 1 : dy / dx;
+		if ((x1 == x2 && y1 == y2))
+			break ;
 
-	float xend = roundf(x0);
-	float yend = y0 + gradient * (xend - x0);
-	float xgap = rfpart(x0 + 0.5f);
-	int xpxl1 = (int)xend;
-	int ypxl1 = (int)yend;
-
-	if (steep)
-	{
-		put_pixel_blend(app, ypxl1, xpxl1, color, rfpart(yend) * xgap);
-		put_pixel_blend(app, ypxl1 + 1, xpxl1, color, (yend - floorf(yend)) * xgap);
-	}
-	else
-	{
-		put_pixel_blend(app, xpxl1, ypxl1, color, rfpart(yend) * xgap);
-		put_pixel_blend(app, xpxl1, ypxl1 + 1, color, (yend - floorf(yend)) * xgap);
-	}
-
-	float intery = yend + gradient;
-
-	xend = roundf(x1);
-	yend = y1 + gradient * (xend - x1);
-	xgap = fpart(x1 + 0.5f);
-	int xpxl2 = (int)xend;
-	int ypxl2 = (int)yend;
-
-	if (steep)
-	{
-		put_pixel_blend(app, ypxl2, xpxl2, color, rfpart(yend) * xgap);
-		put_pixel_blend(app, ypxl2 + 1, xpxl2, color, (yend - floorf(yend)) * xgap);
-	}
-	else
-	{
-		put_pixel_blend(app, xpxl2, ypxl2, color, rfpart(yend) * xgap);
-		put_pixel_blend(app, xpxl2, ypxl2 + 1, color, (yend - floorf(yend)) * xgap);
-	}
-
-	for (int x = xpxl1 + 1; x < xpxl2; x++)
-	{
-		if (steep)
-		{
-			put_pixel_blend(app, (int)intery, x, color, rfpart(intery));
-			put_pixel_blend(app, (int)intery + 1, x, color, (intery - floorf(intery)));
-		}
-		else
-		{
-			put_pixel_blend(app, x, (int)intery, color, rfpart(intery));
-			put_pixel_blend(app, x, (int)intery + 1, color, (intery - floorf(intery)));
-		}
-		intery += gradient;
+		int e2 = err;
+		if (e2 > -dx) { err -= dy; x1 += sx; }
+		if (e2 < dy)  { err += dx; y1 += sy; }
 	}
 }
 
-void project_point(struct s_app *app, float x, float y, float z, int *screen_x, int *screen_y)
+void
+	project_point(struct s_app *app, float x, float y, float z, int *screen_x, int *screen_y)
 {
 	const float epsilon = 0.01f;
-	float scale;
 
-	// Translate to camera space
+	float scale;
 	float dx = x - camera_pos_x;
 	float dy = y - camera_pos_y;
 	float dz = z - camera_pos_z;
-
-	// Rotate around the X-axis (yaw)
 	float rotated_x = dx * cosf(camera_radiant_x) - dz * sinf(camera_radiant_x);
 	float rotated_z = dx * sinf(camera_radiant_x) + dz * cosf(camera_radiant_x);
-
-	// Rotate around the Y-axis (pitch)
 	float rotated_y = dy * cosf(camera_radiant_y) - rotated_z * sinf(camera_radiant_y);
 	rotated_z = dy * sinf(camera_radiant_y) + rotated_z * cosf(camera_radiant_y);
 
-	// Apply perspective projection
 	if (rotated_z < 0.0f)
 		scale = 10.0;
 	else
@@ -181,53 +225,55 @@ void project_point(struct s_app *app, float x, float y, float z, int *screen_x, 
 	*screen_y = (int)(app->height / 2 - rotated_y * scale * app->height);
 }
 
+void draw_block(struct s_app *app, s_block_3d *block) {
+	int px[MAX_VERTICES], py[MAX_VERTICES];
 
-void draw_cube(struct s_app *app, float x, float y, float z, unsigned int color)
-{
-	int			px[8];
-	int			py[8];
-	const float	vertices[8][3] = {
-		{x, y, z},
-		{x + CUBE_SIZE, y, z},
-		{x + CUBE_SIZE, y + CUBE_SIZE, z},
-		{x, y + CUBE_SIZE, z},
-		{x, y, z + CUBE_SIZE},
-		{x + CUBE_SIZE, y, z + CUBE_SIZE},
-		{x + CUBE_SIZE, y + CUBE_SIZE, z + CUBE_SIZE},
-		{x, y + CUBE_SIZE, z + CUBE_SIZE}
-	};
-	
-	for (int i = 0; i < 8; i++)
-		project_point(app, vertices[i][0], vertices[i][1], vertices[i][2], &px[i], &py[i]);
-	
-	// Draw cube edges
-	draw_line_aa(app, px[0], py[0], px[1], py[1], color);
-	draw_line_aa(app, px[1], py[1], px[2], py[2], color);
-	draw_line_aa(app, px[2], py[2], px[3], py[3], color);
-	draw_line_aa(app, px[3], py[3], px[0], py[0], color);
-	
-	draw_line_aa(app, px[4], py[4], px[5], py[5], color);
-	draw_line_aa(app, px[5], py[5], px[6], py[6], color);
-	draw_line_aa(app, px[6], py[6], px[7], py[7], color);
-	draw_line_aa(app, px[7], py[7], px[4], py[4], color);
-	
-	draw_line_aa(app, px[0], py[0], px[4], py[4], color);
-	draw_line_aa(app, px[1], py[1], px[5], py[5], color);
-	draw_line_aa(app, px[2], py[2], px[6], py[6], color);
-	draw_line_aa(app, px[3], py[3], px[7], py[7], color);
+	for (int i = 0; i < MAX_VERTICES; ++i)
+		project_point(app, block->vertices[i].x, block->vertices[i].y, block->vertices[i].z, &px[i], &py[i]);
+
+	for (int i = 0; i < MAX_INDICES; i += 3) {
+		int i0 = block->indices[i];
+		int i1 = block->indices[i + 1];
+		int i2 = block->indices[i + 2];
+
+		if (!TEXTURE)
+		{
+			draw_line(app, px[i0], py[i0], px[i1], py[i1], block->color);
+			draw_line(app, px[i1], py[i1], px[i2], py[i2], block->color);
+			draw_line(app, px[i2], py[i2], px[i0], py[i0], block->color);
+		}
+		else
+		{
+			fill_triangle_textured(app,
+				px[i0], py[i0],
+				px[i1], py[i1],
+				px[i2], py[i2],
+				test_texture, // use block's texture
+				24, 24 // your texture size
+			);
+		}
+	}
 }
 
-void render_voxels(struct s_app *app)
-{
-	for (int x = 0; x < MAP_SIZE; x++)
-	{
-		for (int y = 0; y < MAP_SIZE; y++)
-		{
-			for (int z = 0; z < MAP_SIZE; z++)
-			{
-				if (example_3d_map[x][y][z].visible)
-				{
-					draw_cube(app, x * CUBE_SIZE, y * CUBE_SIZE, z * CUBE_SIZE, example_3d_map[x][y][z].color);
+
+void render_voxels(struct s_app *app) {
+	for (int x = 0; x < MAP_SIZE; x++) {
+		for (int y = 0; y < MAP_SIZE; y++) {
+			for (int z = 0; z < MAP_SIZE; z++) {
+				// Example slab at center
+				if (x == 5 && y == 5 && z == 5) {
+					unsigned int color = test_texture[y % 24][x % 24];
+					if ((color & 0xFF000000U) == 0) continue; // Skip fully transparent blocks
+
+					s_block_3d block = create_slab(x * CUBE_SIZE, y * CUBE_SIZE, z * CUBE_SIZE, CUBE_SIZE, color);
+					draw_block(app, &block);
+				}
+				if (x == 1 && y == 2 && z == 1) {
+					unsigned int color = test_texture[y % 24][x % 24];
+					if ((color & 0xFF000000U) == 0) continue; // Skip fully transparent blocks
+
+					s_block_3d block = create_cube(x * CUBE_SIZE, y * CUBE_SIZE, z * CUBE_SIZE, CUBE_SIZE, color);
+					draw_block(app, &block);
 				}
 			}
 		}
@@ -245,7 +291,10 @@ int loop(void *arg)
 	render_voxels(app);
 
 	if (app->key.esc)
+	{
 		close_window(app);
+		return (0);
+	}
 
 	if (app->key.w)
 	{
@@ -280,38 +329,34 @@ int loop(void *arg)
 	if (app->key.arrow_down)
 		camera_radiant_y -= 0.05;
 
+	for (register int x = 0; x < 24; x++)
+	{
+	    for (register int y = 0; y < 24; y++)
+	    {
+	        for (register int i = 0; i < 6; i++)       // Scale X
+	        {
+	            for (register int j = 0; j < 6; j++)   // Scale Y
+	            {
+	                put_pixel(app, x * 6 + i, y * 6 + j, test_texture[y][x]);
+	            }
+	        }
+	    }
+	}
+
 	return (0);
 }
 
-int
-	main(void)
-{
-	struct s_app	app;
-
+int main(void) {
+	struct s_app app;
 	app_setup(&app);
-	app.fps = 80;
+
+	app.fps = 90;
 	app.window.resizable = 1;
-	app.window.transparency = 0;
-	app.window.maximizable = 1;
 
-	example_3d_map[2][2][2].color = 0xFF0000; // Red voxel
-	example_3d_map[3][2][2].color = 0x00FF00; // Green voxel
-	example_3d_map[4][2][2].color = 0x0000FF; // Blue voxel
-	example_3d_map[2][5][5].color = 0xFFFFFF; // White voxel
+	generate_test_texture();
 
-	example_3d_map[2][2][2].visible = 1;
-	example_3d_map[3][2][2].visible = 1;
-	example_3d_map[4][2][2].visible = 1;
-	example_3d_map[2][5][5].visible = 1;
-
-	camera_pos_x = 7.534571;
-	camera_pos_y = 86.0;
-	camera_pos_z = 5.849144;
-	camera_radiant_x = 0.7;
-	camera_radiant_y = -0.25;
-
-	create_window(&app, 1600, 1600);
-	event_hook_loop(&app, loop, (void *)&app);
+	create_window(&app, 600, 600);
+	event_hook_loop(&app, loop, &app);
 	app_loop(&app);
-	return (0);
+	return 0;
 }

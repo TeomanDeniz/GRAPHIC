@@ -1,5 +1,5 @@
 /******************************************************************************\
-# C - LIBCGFX/CORE_FUNCTIONS/CLOSE_WINDOW        #       Maximum Tension       #
+# C - CLOSE_WINDOW                               #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -32,7 +32,11 @@
 #	endif /* __APPLE_OPENGL__ */
 #else
 #	ifdef _WIN32
-#		include "CLOSE_WINDOW__WINDOWS.h"
+#		ifdef __OPENGL__
+#			include "WINDOWS/CLOSE_WINDOW__WINDOWS__OPENGL.h"
+#		else
+#			include "WINDOWS/CLOSE_WINDOW__WINDOWS__BITMAP.h"
+#		endif /* __OPENGL__ */
 #	else /* DOS */
 #		ifdef __DJGPP__
 #			include "CLOSE_WINDOW__MSDOS.h"
@@ -45,10 +49,10 @@
 #endif /* __APPLE__ */
 
 /* ***************************** [V] LOWERCASE [V] ************************** */
-#ifndef KNR_STYLE /* K&R */
+#ifndef KNR_STYLE /* STANDARD C */
 void
 	close_window(struct s_app *const app)
-#else /* STANDARD C */
+#else /* K&R */
 void
 	close_window(app)
 	struct s_app	*app;

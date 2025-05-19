@@ -1,5 +1,5 @@
 /******************************************************************************\
-# H - LIBCGFX/CORE_FUNCTIONS/APP_LOOP__MSDOS     #       Maximum Tension       #
+# H - APP_LOOP__MSDOS                            #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -21,9 +21,12 @@
 #	include "../../../LIBCMT/KEYWORDS/IGNORE_VAR.h" /*
 #	 define IGNORE_VAR
 #	        */
+#	include "../../../LIBCMT/ENVIRONMENTS/KNR_STYLE.h" /*
+#	 define KNR_STYLE
+#	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
-#	ifdef __STDC__ /* STANDARD C */
+#	ifndef KNR_STYLE /* STANDARD C */
 int
 	APP_LOOP(struct S_APP *APP)
 #	else /* K&R */
@@ -31,7 +34,7 @@ int
 	APP_LOOP(APP)
 
 	struct S_APP	*APP;
-#	endif /* __STDC__ */
+#	endif /* !KNR_STYLE */
 {
 	IGNORE_VAR	APP; // TODO: USE GRAPHIC
 

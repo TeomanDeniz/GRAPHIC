@@ -1,5 +1,5 @@
 /******************************************************************************\
-# H - LIBCGFX/CORE_FUNCTIONS/APP_LOOP__WINDOWS   #       Maximum Tension       #
+# H - CLOSE_WINDOW__WINDOWS__OPENGL              #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -8,51 +8,36 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_APP_LOOP_C
+#ifdef LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_CLOSE_WINDOW_C
 
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../../STRUCTURES.h" /*
+#	include "../../../STRUCTURES.h" /*
 #	 struct S_APP;
 #	        */
 #	include <winuser.h> /*
-#	 define GetMessage(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax)
-#	 define WM_QUIT
-#	 define DispatchMessage(lpMsg)
-#	typedef MSG;
-#	typedef UINT;
-#	   BOOL TranslateMessage(MSG *);
-#	   uint *SetTimer(HWND, UINT_PTR, UINT, TIMERPROC);
+#	   BOOL DestroyWindow(HWND);
+#	   BOOL KillTimer(HWND, UINT_PTR);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
-int
-	APP_LOOP(struct S_APP *APP)
+void
+	CLOSE_WINDOW(struct S_APP *const APP)
 {
-	MSG	EVENT_MSG = {0};
+	if (!APP)
+		return ;
 
-	SetTimer(
-		APP->WINDOW_HANDLE,
-		1,
-		(UINT)((1.0 / (double)APP->FPS) * 1000),
-		((void *)0)
-	);
-
-	while (GetMessage(&EVENT_MSG, ((void *)0), 0, 0))
+	if (!!APP->WINDOW_HANDLE)
 	{
-		if (EVENT_MSG.message == WM_QUIT)
-			return (1);
-
-		TranslateMessage(&EVENT_MSG);
-		DispatchMessage(&EVENT_MSG);
+		KillTimer(APP->WINDOW_HANDLE, 1);
+		DestroyWindow(APP->WINDOW_HANDLE);
+		APP->WINDOW_HANDLE = ((void *)0);
 	}
-
-	return (0);
 }
 
 #else
 #	error "Please do not include this header directly!"
-#endif /* LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_APP_LOOP_C */
+#endif /* LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_CLOSE_WINDOW_C */

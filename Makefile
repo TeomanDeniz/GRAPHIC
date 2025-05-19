@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2022/10/24 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2024/06/08 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 #******************************************************************************#
 
@@ -27,12 +27,12 @@ MAIN_SRC = \
 	./LIBCGFX/CORE_FUNCTIONS/APP_TIME/APP_TIME.c \
 	./LIBCGFX/CORE_FUNCTIONS/CLOSE_WINDOW/CLOSE_WINDOW.c \
 	./LIBCGFX/CORE_FUNCTIONS/CREATE_WINDOW/CREATE_WINDOW.c \
-	./LIBCGFX/CORE_FUNCTIONS/SET_TITLE/SET_TITLE.c
+	./LIBCGFX/CORE_FUNCTIONS/SET_TITLE/SET_TITLE.c \
+	./LIBCGFX/CORE_FUNCTIONS/SET_CURSOR/SET_CURSOR.c \
+	./LIBCGFX/CORE_FUNCTIONS/SET_CURSOR_POSITION/SET_CURSOR_POSITION.c
 # *************************** [^] MAIN SOURCES [^] *************************** #
 
 # **************************** [v] VARIABLES [v] ***************************** #
-MACOS_OPENGL_SUPPORTED := \
-	$(shell test -d "/System/Library/Frameworks/OpenGL.framework" && echo yes)
 	# [COMPILER]
 		CC			=	gcc
 	# [COMPILER]
@@ -43,15 +43,26 @@ MACOS_OPENGL_SUPPORTED := \
 		CFLAGS		=	-O3 -Wall -Wextra -Werror
 		CFLAGS		+= -Wno-unused-command-line-argument
 		ifeq ($(shell uname -s),Darwin)
+			MACOS_OPENGL_SUPPORTED := \
+				$(shell \
+					test -d \
+						"/System/Library/Frameworks/OpenGL.framework" \
+					&& echo yes\
+				)
+
 			CFLAGS += -framework Cocoa # CORE GRPAHICS
 			CFLAGS += -framework AudioToolbox # AUDIO HANDLE
 			ifeq ($(MACOS_OPENGL_SUPPORTED), yes)
 				CFLAGS += -DGL_SILENCE_DEPRECATION # IGNORE OS WARNINGS
-				# MACOS IS GIVING WARNINGS IF YOU HAVE OPENGL ABOVE MAC - 10.14
+				# MACOS GIVING WARNINGS IF YOU HAVE OPENGL ABOVE MAC - 10.14
 				CFLAGS += -D__APPLE_OPENGL__ # OPENGL
 			endif
 		else
-			CFLAGS += -lX11 -lasound # X11
+			ifeq ($(OS),Windows_NT)
+				CFLAGS += -lgdi32
+			else # X11 (PROBABLY)
+				CFLAGS += -lX11 -lasound # X11
+			endif
 		endif
 	# [COMPILER FLAGS]
 	# [.c STRINGS TO .o]
@@ -130,4 +141,7 @@ fclean: clean
 
 re: fc all
 
-.PHONY: all fclean fc clean clear c
+opengl: CFLAGS += -D__OPENGL__ -lopengl32
+opengl: all
+
+.PHONY: all fclean fc clean clear c opengl

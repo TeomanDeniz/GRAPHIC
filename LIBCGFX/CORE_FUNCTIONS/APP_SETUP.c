@@ -1,5 +1,5 @@
 /******************************************************************************\
-# C - LIBCGFX/CORE_FUNCTIONS/APP_SETUP           #       Maximum Tension       #
+# C - APP_SETUP                                  #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/05 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -26,10 +26,10 @@
 #        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
-#ifndef KNR_STYLE /* K&R */
+#ifndef KNR_STYLE /* STANDARD C */
 void
 	APP_SETUP(struct S_APP *const APP)
-#else /* STANDARD C */
+#else /* K&R */
 void
 	APP_SETUP(APP)
 	struct S_APP	*APP;
@@ -56,10 +56,10 @@ void
 }
 
 /* ***************************** [V] LOWERCASE [V] ************************** */
-#ifndef KNR_STYLE /* K&R */
+#ifndef KNR_STYLE /* STANDARD C */
 void
 	app_setup(struct s_app *const app)
-#else /* STANDARD C */
+#else /* K&R */
 void
 	app_setup(app)
 	struct s_app	*app;

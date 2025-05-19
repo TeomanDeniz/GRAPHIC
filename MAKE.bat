@@ -8,7 +8,7 @@
 :: +.....................++.....................+#  :!:: :!:!1:!:!::1:::!!!:  ::
 :: : C - Maximum Tension :: Create - 2022/12/09 :#  ::!::!!1001010!:!11!!::   ::
 :: :---------------------::---------------------:#  :!1!!11000000000011!!:    ::
-:: : License - APACHE 2  :: Update - 2025/04/02 :#   ::::!!!1!!1!!!1!!!::     ::
+:: : License - APACHE 2  :: Update - 2025/05/19 :#   ::::!!!1!!1!!!1!!!::     ::
 :: +.....................++.....................+#      ::::!::!:::!::::      ::
 ::****************************************************************************::
 
@@ -41,7 +41,9 @@ LIBCGFX\CORE_FUNCTIONS\APP_SLEEP\APP_SLEEP.c ^
 LIBCGFX\CORE_FUNCTIONS\APP_TIME\APP_TIME.c ^
 LIBCGFX\CORE_FUNCTIONS\CLOSE_WINDOW\CLOSE_WINDOW.c ^
 LIBCGFX\CORE_FUNCTIONS\CREATE_WINDOW\CREATE_WINDOW.c ^
-LIBCGFX\CORE_FUNCTIONS\SET_TITLE\SET_TITLE.c
+LIBCGFX\CORE_FUNCTIONS\SET_TITLE\SET_TITLE.c ^
+LIBCGFX\CORE_FUNCTIONS\SET_CURSOR\SET_CURSOR.c ^
+LIBCGFX\CORE_FUNCTIONS\SET_CURSOR_POSITION\SET_CURSOR_POSITION.c
 REM [FILES TO COMPILE]
 
 SET "MAIN="
@@ -51,6 +53,11 @@ SET "CFLAGS=-Wall -Wextra -Werror -O3 -lgdi32 -c"
 REM [COMPILER FLAGS]
 
 GOTO :Makefile %*
+
+:OPENGL
+	SET "CFLAGS=!CFLAGS! -D__OPENGL__ -lopengl32"
+	CALL :ALL
+GOTO :EOF
 
 :A
 :ALL

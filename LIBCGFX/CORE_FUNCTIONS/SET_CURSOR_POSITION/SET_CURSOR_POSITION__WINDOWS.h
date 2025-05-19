@@ -1,6 +1,5 @@
 /******************************************************************************\
-# H - LIBCGFX/CORE_FUNCTIONS/                    #       Maximum Tension       #
-# CLOSE_WINDOW__WINDOWS                          #                             #
+# H - SET_CURSOR_POSITION__WINDOWS               #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -9,45 +8,32 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
-#ifdef LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_CLOSE_WINDOW_C
+#ifdef LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_SET_CURSOR_POSITION_C
 
 /* **************************** [v] INCLUDES [v] **************************** */
 #	include "../../STRUCTURES.h" /*
 #	 struct S_APP;
 #	        */
-#	include <winuser.h> /*
-#	   BOOL DestroyWindow(HWND);
-#	   BOOL KillTimer(HWND, UINT_PTR);
+#	include "../../../LIBCMT/KEYWORDS/IGNORE_VAR.h" /*
+#	 define IGNORE_VAR
 #	        */
-#	include <stdlib.h> /*
-#	   void free(void *);
+#	include <winuser.h> /*
+#	   BOOL SetCursorPos(int, int);
 #	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
 void
-	CLOSE_WINDOW(struct S_APP *const APP)
+	SET_CURSOR_POSITION(struct S_APP *const APP, const int X, const int Y)
 {
-	if (!APP)
-		return ;
+	IGNORE_VAR	APP;
 
-	if (!!APP->WINDOW_HANDLE)
-	{
-		KillTimer(APP->WINDOW_HANDLE, 1);
-		DestroyWindow(APP->WINDOW_HANDLE);
-		APP->WINDOW_HANDLE = ((void *)0);
-	}
-
-	if (!!APP->BUFFER)
-	{
-		free(APP->BUFFER); 
-		APP->BUFFER = ((void *)0);
-	}
+	SetCursorPos(X, Y);
 }
 
 #else
 #	error "Please do not include this header directly!"
-#endif /* LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_CLOSE_WINDOW_C */
+#endif /* LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_SET_CURSOR_POSITION_C */

@@ -1,5 +1,5 @@
 /******************************************************************************\
-# C - LIBCGFX/EVENT_HOOKS/CLOSE                  #       Maximum Tension       #
+# C - EVENT_HOOK_CLOSE                           #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/23 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/02 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -22,32 +22,32 @@
 #        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
-#ifndef KNR_STYLE /* K&R */
+#ifndef KNR_STYLE /* STANDARD C */
 void
 	EVENT_HOOK_CLOSE(struct S_APP *const APP, int (*F)(void *), void *ARG)
-#else /* STANDARD C */
+#else /* K&R */
 void
 	EVENT_HOOK_CLOSE(APP, F, ARG)
 	struct S_APP	*APP;
 	int	(*F)(void *);
 	void			*ARG;
-#endif /* KNR_STYLE */
+#endif /* !KNR_STYLE */
 {
 	APP->FUNCTION_CLOSE = F;
 	APP->FUNCTION_CLOSE_ARG = ARG;
 }
 
 /* ***************************** [V] LOWERCASE [V] ************************** */
-#ifndef KNR_STYLE /* K&R */
+#ifndef KNR_STYLE /* STANDARD C */
 void
 	event_hook_close(struct s_app *const app, int (*f)(void *), void *arg)
-#else /* STANDARD C */
+#else /* K&R */
 void
 	event_hook_close(app, f, arg)
 	struct s_app	*app;
 	int	(*f)(void *);
 	void			*arg;
-#endif /* KNR_STYLE */
+#endif /* !KNR_STYLE */
 {
 	app->FUNCTION_CLOSE = f;
 	app->FUNCTION_CLOSE_ARG = arg;

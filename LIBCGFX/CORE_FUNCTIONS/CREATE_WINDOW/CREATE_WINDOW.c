@@ -1,5 +1,5 @@
 /******************************************************************************\
-# C - LIBCGFX/CORE_FUNCTIONS/CREATE_WINDOW       #       Maximum Tension       #
+# C - CREATE_WINDOW                              #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/05 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -32,7 +32,11 @@
 #	endif /* __APPLE_OPENGL__ */
 #else
 #	ifdef _WIN32
-#		include "CREATE_WINDOW__WINDOWS.h"
+#		ifdef __OPENGL__
+#			include "WINDOWS/CREATE_WINDOW__WINDOWS__OPENGL.h"
+#		else
+#			include "WINDOWS/CREATE_WINDOW__WINDOWS__BITMAP.h"
+#		endif /* __OPENGL__ */
 #	else /* DOS */
 #		ifdef __DJGPP__
 #			include "CREATE_WINDOW__MSDOS.h"

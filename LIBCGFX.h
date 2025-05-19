@@ -4,22 +4,16 @@
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
 # maximum-tension.com                            #  ::                      :: #
-# ---------------------------------------------- #  :!:    : :: : :  :  ::::!: #
-# Serge Zaitsev (Aka: zserge)                    #   :!:: :!:!1:!:!::1:::!!!:  #
-# Dimitri Sokolyuk (Aka: dim13)                  #   ::!::!!1001010!:!11!!::   #
-# Ian Bryant (Aka: recidivism5)                  #   :!1!!11000000000011!!:    #
-# Kirill (Aka: dartvader316)                     #    ::::!!!1!!1!!!1!!!::     #
-# Grauho (Aka: grauho)                           #       ::::!::!:::!::::      #
-#                                                #                             #
-# +.....................++.....................+ #                             #
-# : C - Maximum Tension :: Create - 2023/05/25 : #                             #
-# :---------------------::---------------------: #                             #
-# : License - APACHE 2  :: Update - 2025/04/03 : #                             #
-# +.....................++.....................+ #                             #
+#                                                #  :!:    : :: : :  :  ::::!: #
+# +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
+# : C - Maximum Tension :: Create - 2023/05/25 : #   ::!::!!1001010!:!11!!::   #
+# :---------------------::---------------------: #   :!1!!11000000000011!!:    #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
+# +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
 #ifndef LIBCGFX_H
-#	define LIBCGFX_H 202504 /* VERSION */
+#	define LIBCGFX_H 202505 /* VERSION */
 
 /* *************************** [v] TI CGT CCS [v] *************************** */
 #	ifdef __TI_COMPILER_VERSION__
@@ -29,6 +23,7 @@
 
 /* *************************** [v] C++ (PUSH) [v] *************************** */
 #	ifdef __cplusplus /* C++ */
+#		define register /* IGNORE REGISTER KEYWORD */
 extern "C" {
 #	endif /* __cplusplus */
 /* *************************** [^] C++ (PUSH) [^] *************************** */
@@ -50,76 +45,24 @@ extern "C" {
 #	 struct S_APP;
 #	 struct s_app;
 #	        */
-#	ifdef __DJGPP__
-#		include <go32.h> /*
-#		 define _dos_ds;
-#		        */
-#		include <sys/farptr.h> /*
-#		   void _farpokeb(short, long, char);
-#		        */
-#	endif /* __DJGPP__ */
+#	include "LIBCGFX/CORE_FUNCTIONS/PUT_PIXEL/PUT_PIXEL.h" /*
+#	 define PUT_PIXEL(
+>	        	__PUT_PIXEL_GRAPHIC__,
+>	        	__PUT_PIXEL_X__,
+>	        	__PUT_PIXEL_Y__,
+>	        	__PUT_PIXEL_COLOR__
+>	        )
+#	 define put_pixel(
+>	        	__put_pixel_graphic__,
+>	        	__put_pixel_x__,
+>	        	__put_pixel_y__,
+>	        	__put_pixel_color__
+>	        )
+#	        */
 /* **************************** [^] INCLUDES [^] **************************** */
 
-/* *************************** [v] PUT_PIXEL [v] **************************** */
-#	ifdef __DJGPP__
-#		define PUT_PIXEL(\
-			__PUT_PIXEL_GRAPHIC__, \
-			__PUT_PIXEL_X__, \
-			__PUT_PIXEL_Y__, \
-			__PUT_PIXEL_COLOR__\
-		) (\
-			_farpokeb(\
-				_dos_ds, \
-				0XA0000 + (__PUT_PIXEL_Y__ * 320) + __PUT_PIXEL_X__, \
-				__PUT_PIXEL_COLOR__\
-			)\
-		)
-#		define put_pixel(\
-			__put_pixel_graphic__, \
-			__put_pixel_x__, \
-			__put_pixel_y__, \
-			__put_pixel_color__\
-		) (\
-			_farpokeb(\
-				_dos_ds, \
-				0XA0000 + (__put_pixel_y__ * 320) + __put_pixel_x__, \
-				__put_pixel_color__\
-			)\
-		)
-#	else /* !__DJGPP__ */
-#		define PUT_PIXEL(\
-			__PUT_PIXEL_GRAPHIC__, \
-			__PUT_PIXEL_X__, \
-			__PUT_PIXEL_Y__, \
-			__PUT_PIXEL_COLOR__\
-		) (\
-			(\
-				(__PUT_PIXEL_GRAPHIC__)->BUFFER[\
-					(\
-						(__PUT_PIXEL_Y__) * (__PUT_PIXEL_GRAPHIC__)->WIDTH\
-					) + (__PUT_PIXEL_X__)\
-				]\
-			) = __PUT_PIXEL_COLOR__\
-		)
-#		define put_pixel(\
-			__put_pixel_graphic__, \
-			__put_pixel_x__, \
-			__PUT_PIXEL_Y__, \
-			__put_pixel_color__\
-		) (\
-			(\
-				(__put_pixel_graphic__)->buffer[\
-					(\
-						(__PUT_PIXEL_Y__) * (__put_pixel_graphic__)->width\
-					) + (__put_pixel_x__)\
-				]\
-			) = __put_pixel_color__\
-		)
-#	endif /* __DJGPP__ */
-/* *************************** [^] PUT_PIXEL [^] **************************** */
-
-#	ifndef KNR_STYLE /* K&R */
-/* *************************** [v] FUNCTIONS [v] **************************** */
+#	ifndef KNR_STYLE /* STANDARD C */
+/* ************************* [v] CORE_FUNCTIONS [v] ************************* */
 extern int	APP_LOOP(struct S_APP *APP);
 extern int	app_loop(struct s_app *app);
 extern void	APP_SLEEP(register long MILLISECONDS);
@@ -144,9 +87,27 @@ extern void	*APP_INIT(void);
 extern void	*app_init(void);
 extern void	APP_SETUP(struct S_APP *const APP);
 extern void	app_setup(struct s_app *const app);
-/* *************************** [^] FUNCTIONS [^] **************************** */
+extern void	SET_CURSOR(
+	struct S_APP *const APP,
+	const unsigned char CURSOR_TYPE
+);
+extern void	set_cursor(
+	struct s_app *const app,
+	const unsigned char cursor_type
+);
+extern void	set_cursor_position(
+	struct s_app *const app,
+	const int x,
+	const int y
+);
+extern void	SET_CURSOR_POSITION(
+	struct S_APP *const APP,
+	const int X,
+	const int Y
+);
+/* ************************* [^] CORE_FUNCTIONS [^] ************************* */
 
-/* ************************** [v] EVENT HOOKS [v] *************************** */
+/* ************************** [v] EVENT_HOOKS [v] *************************** */
 extern void	EVENT_HOOK_CLOSE(
 	const struct S_APP *const APP,
 	int (*F)(void *),
@@ -206,9 +167,9 @@ extern void	event_hook_resize(
 	struct s_app *const app,
 	int (*f)(void *),
 	void *arg);
-/* ************************** [^] EVENT HOOKS [^] *************************** */
-#	else /* STANDARD C */
-/* *************************** [v] FUNCTIONS [v] **************************** */
+/* ************************** [^] EVENT_HOOKS [^] *************************** */
+#	else /* K&R */
+/* ************************* [v] CORE_FUNCTIONS [v] ************************* */
 extern int	APP_LOOP();
 extern int	app_loop();
 extern void	APP_SLEEP()
@@ -225,9 +186,13 @@ extern void	*APP_INIT();
 extern void	*app_init();
 extern void	APP_SETUP();
 extern void	app_setup();
-/* *************************** [^] FUNCTIONS [^] **************************** */
+extern void	SET_CURSOR();
+extern void	set_cursor();
+extern void	set_cursor_position();
+extern void	SET_CURSOR_POSITION();
+/* ************************* [^] CORE_FUNCTIONS [^] ************************* */
 
-/* ************************** [v] EVENT HOOKS [v] *************************** */
+/* ************************** [v] EVENT_HOOKS [v] *************************** */
 extern void	EVENT_HOOK_CLOSE();
 extern void	event_hook_close();
 extern void	EVENT_HOOK_KEY_DOWN();
@@ -238,7 +203,7 @@ extern void	EVENT_HOOK_LOOP();
 extern void	event_hook_loop();
 extern void	EVENT_HOOK_MOUSE();
 extern void	event_hook_mouse();
-/* ************************** [^] EVENT HOOKS [^] *************************** */
+/* ************************** [^] EVENT_HOOKS [^] *************************** */
 #	endif /* !KNR_STYLE */
 
 /* *************************** [v] C++ (POP) [v] **************************** */

@@ -1,6 +1,5 @@
 /******************************************************************************\
-# H - LIBCGFX/CORE_FUNCTIONS/                    #       Maximum Tension       #
-# CREATE_WINDOW__WINDOWS                         #                             #
+# H - CREATE_WINDOW__WINDOWS__BITMAP             #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -9,21 +8,22 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/05/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/06 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
 #ifdef LOCALMACRO__LIBCGFX_CORE_FUNCTIONS_CREATE_WINDOW_C
 
 /* **************************** [v] INCLUDES [v] **************************** */
-#	include "../../../LIBCGFX.h" /*
+#	include "../../../../LIBCGFX.h" /*
 #	 struct S_APP;
 #	   void CLOSE_WINDOW(struct S_APP *);
+#	   void SET_CURSOR(struct S_APP *, uchar);
 #	        */
-#	include "../../../LIBCMT/FUNCTIONS/PREFETCH.h" /*
+#	include "../../../../LIBCMT/FUNCTIONS/PREFETCH.h" /*
 #	   void PREFETCH_RANGE(void *, uint);
 #	        */
-#	include "../../../LIBCMT/KEYWORDS/IGNORE_VAR.h" /*
+#	include "../../../../LIBCMT/KEYWORDS/IGNORE_VAR.h" /*
 #	 define IGNORE_VAR
 #	        */
 #	include <windef.h> /*
@@ -65,7 +65,6 @@
 #	 define GetWindowLongPtr(hWnd, nIndex)
 #	 define SetWindowLongPtr(hWnd, nIndex, dwNewLong)
 #	 define DefWindowProc(hWnd, Msg, wParam, lParam)
-#	 define LoadCursor(hInstance, lpCursorName)
 #	 define CS_VREDRAW
 #	 define CS_HREDRAW
 #	 define SW_SHOW
@@ -100,7 +99,6 @@
 #	 define ULW_ALPHA
 #	 define GWLP_USERDATA
 #	 define SIZE_MINIMIZED
-#	 define IDC_ARROW
 #	typedef RECT;
 #	typedef POINT;
 #	typedef SIZE;
@@ -119,7 +117,6 @@
 #	HBITMAP CreateDIBSection(HDC, BITMAPINFO, UINT, VOID, HANDLE, DWORD);
 #	   BOOL SetWindowPos(HWND, HWND, int, int, int, int, UINT);
 #	   BOOL InvalidateRect(HWND, LPCRECT, BOOL);
-#	HCURSOR SetCursor(HCURSOR);
 #	        */
 #	include <stdlib.h> /*
 #	typedef size_t;
@@ -140,7 +137,7 @@ static LRESULT CALLBACK	APP_WINDOW_PROCESS_HANDLE(\
 	const WPARAM W_PARAM,
 	const LPARAM L_PARAM
 );
-extern void				REFRESH_SCREEN(const struct S_APP	*const APP);
+extern void				REFRESH_SCREEN(const struct S_APP *const APP);
 extern int				IDLE_FUNCTION(void *ARG);
 /* *************************** [^] PROTOTYPES [^] *************************** */
 
@@ -452,7 +449,13 @@ static LRESULT CALLBACK
 	if (!APP)
 		return (1);
 
-	memset(&APP->MOUSE, 0, sizeof(APP->MOUSE));
+	{
+		register unsigned char	CURSOR;
+
+		CURSOR = APP->MOUSE.CURSOR;
+		memset(&APP->MOUSE, 0, sizeof(APP->MOUSE));
+		APP->MOUSE.CURSOR = CURSOR;
+	}
 
 	switch (MSG)
 	{ // "switch case" is speed! Wrom wrommmm!!!
@@ -1149,7 +1152,7 @@ static LRESULT CALLBACK
 		{
 			APP->MOUSE.Y = HIWORD(L_PARAM);
 			APP->MOUSE.X = LOWORD(L_PARAM);
-			SetCursor(LoadCursor((void *)0, IDC_ARROW)); // FIX AN ANNOYING BUG
+			SET_CURSOR(APP, APP->MOUSE.CURSOR); // FIX AN ANNOYING BUG
 
 			if (!!APP->FUNCTION_MOUSE)
 			{

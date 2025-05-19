@@ -1,6 +1,5 @@
 /******************************************************************************\
-# H - LIBCGFX/CORE_FUNCTIONS/                    #       Maximum Tension       #
-# CREATE_WINDOW__MACOS_OPENGL                    #                             #
+# H - CREATE_WINDOW__MACOS_OPENGL                #       Maximum Tension       #
 ################################################################################
 #                                                #      -__            __-     #
 # Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
@@ -9,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2024/06/08 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - APACHE 2  :: Update - 2025/04/04 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - APACHE 2  :: Update - 2025/05/19 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -81,7 +80,7 @@
 #	   void glGenTextures(GLsizei, GLuint *);
 #	   void glBindTexture(GLenum, GLuint);
 #	   void glTexImage2D(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum,
->	        GLenum, GLvoid *);
+>	        	GLenum, GLvoid *);
 #	   void glTexParameteri(GLenum, GLenum, GLint);
 #	   void glDeleteBuffers(GLsizei, GLuint *);
 #	   void glDeleteTextures(GLsizei, GLuint *);
@@ -94,7 +93,7 @@
 #	typedef GLuint;
 v	>>>>>>> (CGLError)
 #	^^^^^^^ CGLChoosePixelFormat(CGLPixelFormatAttribute *, CGLPixelFormatObj *,
->	        GLint *);
+>	        	GLint *);
 v	>>>>>>> (CGLError)
 #	^^^^^^^ CGLCreateContext(CGLPixelFormatObj, CGLContextObj, CGLContextObj *);
 v	>>>>>>> (CGLError)
